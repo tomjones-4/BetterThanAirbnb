@@ -33,10 +33,6 @@ export const Navigation = () => {
               <Search size={20} />
               <span>Search</span>
             </a>
-            <Button variant="outline" className="flex items-center space-x-2">
-              <User size={20} />
-              <span>Sign In</span>
-            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -66,13 +62,6 @@ export const Navigation = () => {
               <Search size={20} />
               <span>Search</span>
             </a>
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center space-x-2"
-            >
-              <User size={20} />
-              <span>Sign In</span>
-            </Button>
           </div>
         </div>
       )}
