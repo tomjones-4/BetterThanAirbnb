@@ -10,7 +10,6 @@ import { MessageCircle } from "lucide-react";
 
 const Index = () => {
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Navigation />
