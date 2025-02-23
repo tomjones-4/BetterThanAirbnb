@@ -49,6 +49,7 @@ export const mockProperties: Property[] = [
       "https://images.unsplash.com/photo-1507089947368-19c1da9775ae",
       "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6"
     ],
+    hostId: "u1",
     host: mockUsers[0],
     amenities: ["WiFi", "Kitchen", "Gym", "Pool", "Parking"],
     maxGuests: 4,
@@ -85,6 +86,7 @@ export const mockProperties: Property[] = [
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750",
       "https://images.unsplash.com/photo-1416331108676-a22ccb276e35"
     ],
+    hostId: "u2",
     host: mockUsers[1],
     amenities: ["WiFi", "Kitchen", "Pool", "Beach Access", "BBQ"],
     maxGuests: 8,

@@ -1,12 +1,16 @@
-
 import { Navigation } from "@/components/Navigation";
 import { SearchBar } from "@/components/SearchBar";
 import { PropertyCard } from "@/components/PropertyCard";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, MapPin, Calendar, DollarSign } from "lucide-react";
 import { mockProperties } from "@/data/mockData";
+import { useState } from "react";
+import { Messages } from "@/components/Messages";
+import { MessageCircle } from "lucide-react";
 
 const Index = () => {
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Navigation />
@@ -83,6 +87,22 @@ const Index = () => {
           </div>
         </div>
       </section>
+      {/* Messages Sidebar */}
+      <div
+        className={`fixed right-0 top-0 h-full w-96 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+          isMessagesOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <Messages />
+      </div>
+      {/* Toggle Button */}
+      <Button
+        onClick={() => setIsMessagesOpen(!isMessagesOpen)}
+        className="fixed bottom-6 right-6 rounded-full h-12 w-12 p-0 flex items-center justify-center shadow-lg"
+        variant="default"
+      >
+        <MessageCircle className="h-6 w-6" />
+      </Button>
     </div>
   );
 };
