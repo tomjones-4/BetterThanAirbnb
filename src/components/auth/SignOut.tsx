@@ -1,15 +1,19 @@
-import { supabase } from "../../lib/supabase";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 
-const SignOut = () => {
+interface SignOutProps {
+  onSessionChange: (session: any) => void;
+}
+
+export const SignOut: React.FC<SignOutProps> = ({ onSessionChange }) => {
   const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error: any) {
-      console.error("Error signing out:", error.message);
-    }
+    await supabase.auth.signOut();
+    onSessionChange(null);
   };
 
-  return <button onClick={handleSignOut}>Sign Out</button>;
+  return (
+    <Button variant="outline" onClick={handleSignOut}>
+      Sign Out
+    </Button>
+  );
 };
-
-export default SignOut;
