@@ -21,8 +21,7 @@ const defaultCenter = { lat: 40.7128, lng: -74.006 }; // Default to New York
 
 const SearchResults: React.FC<SearchResultsProps> = ({ properties }) => {
   const { isLoaded } = useLoadScript({
-    //googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    googleMapsApiKey: import.meta.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: import.meta.env.GOOGLE_MAPS_API_KEY || '',
   });
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
