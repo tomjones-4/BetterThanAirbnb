@@ -1,13 +1,18 @@
 
+import { useState } from "react";
 import { Property } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Star, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { BookingDialog } from "./BookingDialog";
 
 interface PropertyCardProps {
   property: Property;
 }
 
 export const PropertyCard = ({ property }: PropertyCardProps) => {
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
       <div className="aspect-video relative overflow-hidden">
@@ -34,19 +39,32 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center space-x-4 text-sm text-gray-600">
-          <div className="flex items-center space-x-1">
-            <Users className="w-4 h-4" />
-            <span>Up to {property.maxGuests} guests</span>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-4 text-sm text-gray-600">
+            <div className="flex items-center space-x-1">
+              <Users className="w-4 h-4" />
+              <span>Up to {property.maxGuests} guests</span>
+            </div>
+            <div>
+              {property.bedrooms} {property.bedrooms === 1 ? "bedroom" : "bedrooms"}
+            </div>
+            <div>
+              {property.baths} {property.baths === 1 ? "bath" : "baths"}
+            </div>
           </div>
-          <div>
-            {property.bedrooms} {property.bedrooms === 1 ? "bedroom" : "bedrooms"}
-          </div>
-          <div>
-            {property.baths} {property.baths === 1 ? "bath" : "baths"}
-          </div>
+          <Button 
+            className="w-full"
+            onClick={() => setIsBookingOpen(true)}
+          >
+            Check Availability
+          </Button>
         </div>
       </CardContent>
+      <BookingDialog 
+        property={property}
+        open={isBookingOpen}
+        onOpenChange={setIsBookingOpen}
+      />
     </Card>
   );
 };
