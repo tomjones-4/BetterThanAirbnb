@@ -1,7 +1,7 @@
 import { SearchBar } from "@/components/SearchBar";
 import { Messages } from "@/components/Messages";
 
-export const Index = () => {
+const Index = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <SearchBar />
@@ -11,3 +11,5 @@ export const Index = () => {
     </div>
   );
 };
+
+export default Index;
