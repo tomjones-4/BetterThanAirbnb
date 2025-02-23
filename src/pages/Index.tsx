@@ -7,17 +7,6 @@ import { mockProperties } from "@/data/mockData";
 import { useState, useEffect } from "react";
 import { Messages } from "@/components/Messages";
 import { MessageCircle } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { supabase } from "@/lib/supabase";
 
 const Index = () => {
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
@@ -48,52 +37,6 @@ const Index = () => {
             <Button variant="outline" size="lg" className="w-full md:w-auto">
               List Your Property
             </Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline">Sign In / Sign Up</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Authentication</DialogTitle>
-                  <DialogDescription>
-                    Choose your preferred method to sign in or sign up.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="email" className="text-right">
-                      Email
-                    </Label>
-                    <Input id="email" value={"test"} className="col-span-3" />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="password" className="text-right">
-                      Password
-                    </Label>
-                    <Input
-                      type="password"
-                      id="password"
-                      value={"test"}
-                      className="col-span-3"
-                    />
-                  </div>
-                </div>
-                {/* <DialogFooter>
-                  <Button type="submit">Save changes</Button>
-                </DialogFooter> */}
-                <Button
-                  onClick={async () => {
-                    const { data, error } = await supabase.auth.signInWithOAuth(
-                      {
-                        provider: "google",
-                      }
-                    );
-                  }}
-                >
-                  Sign In with Google
-                </Button>
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
       </section>
