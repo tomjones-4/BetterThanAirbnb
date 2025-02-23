@@ -24,6 +24,7 @@ export interface Property {
     };
   };
   images: string[];
+  hostId: string; // Added to link property with host
   host: User;
   amenities: string[];
   maxGuests: number;
