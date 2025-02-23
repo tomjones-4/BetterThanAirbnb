@@ -1,0 +1,141 @@
+# Clinerules for Modern React Application Development
+
+This document outlines the current best practices and rules for developing React applications, focusing on performance, maintainability, and modern development patterns.
+
+## 1. Code Performance
+
+### 1.1 Component Optimization
+
+* **Code Splitting:** Use React.lazy() and Suspense for component-level code splitting to reduce initial bundle size.
+* **Lazy Loading:** Implement lazy loading for images and heavy components that are not immediately needed.
+* **Memoization:** Use React.memo() strategically for expensive components that receive stable props.
+* **Render Optimization:** Implement debouncing and throttling for expensive operations or frequent updates.
+* **Bundle Optimization:** Use dynamic imports for routes and large dependencies that aren't needed immediately.
+
+### 1.2 State Management
+
+* **Local State:** Use useState for simple component-level state.
+* **Complex State:** Use modern state management solutions:
+  - Zustand for simple global state
+  - Jotai for atomic state management
+  - TanStack Query (React Query) for server state
+* **State Colocation:** Keep state as close as possible to where it's used.
+* **Immutable Updates:** Always use immutable state updates to ensure proper rendering.
+* **Computed State:** Cache computed values using useMemo when dealing with expensive calculations.
+
+### 1.3 Rendering Optimization
+
+* **Stable References:** Use useCallback for function props passed to memoized components.
+* **Event Handlers:** Define event handlers outside render when possible.
+* **List Rendering:** Always use stable, unique keys for list items.
+* **Batch Updates:** Utilize React's automatic batching for state updates.
+* **Performance Monitoring:** Use React DevTools Profiler to identify and fix performance bottlenecks.
+
+## 2. Code Maintainability
+
+### 2.1 Component Architecture
+
+* **Composition:** Use component composition over inheritance.
+* **Custom Hooks:** Extract reusable logic into custom hooks.
+* **Feature-First Structure:** Organize code by features rather than technical concerns:
+```
+src/
+  features/
+    auth/
+      components/
+      hooks/
+      utils/
+      types/
+    dashboard/
+    settings/
+  shared/
+    components/
+    hooks/
+    utils/
+```
+* **Component Size:** Keep components focused and manageable (under 250 lines).
+
+### 2.2 Modern Development Practices
+
+### 2.3 Testing Best Practices
+
+* **Component Testing:**
+  - Use @testing-library/react
+  - Test component behavior, not implementation
+  - Write tests from user perspective
+* **Hook Testing:**
+  - Use @testing-library/react-hooks
+  - Test custom hooks in isolationUI components
+
+## 3. Build and Development Tools
+
+### 3.1 Modern Tooling
+
+
+### 3.2 Code Quality Tools
+
+* **ESLint Configuration:**
+```json
+{
+  "extends": [
+    "react-app",
+    "react-app/jest",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  }
+}
+```
+* **Prettier:** Enforce consistent code formatting
+* **Git Hooks:** Use husky for pre-commit checks:
+  - Lint staged files
+  - Run relevant tests
+  - Check TypeScript types
+
+## 4. API Integration
+
+### 4.1 Data Fetching
+
+* **API Client:** Use TanStack Query for data fetching:
+  - Automatic caching
+  - Background updates
+  - Optimistic updates
+  - Error handling
+* **Error Handling:**
+  - Implement error boundaries
+  - Provide fallback UI components
+  - Log errors to monitoring service
+
+## 5. Accessibility
+
+* **Components:**
+  - Use semantic HTML elements
+  - Implement proper ARIA attributes
+  - Ensure keyboard navigation
+* **Focus Management:**
+  - Maintain focus order
+  - Trap focus in modals
+  - Provide skip links
+* **Testing:**
+  - Use jest-axe for automated checks
+  - Test with screen readers
+  - Verify color contrast
+
+
+## 6. Changelog Management
+
+### 6.1 Changelog File
+
+* Maintain a `changelog.md` file in the root directory of the project to track all significant changes.
+
+### 6.2 Changelog Updates
+
+* **Rule:** After any accepted code change (e.g., using `replace_in_file` or `write_to_file`), automatically update the `changelog.md` file.
+* **Format:** Use a consistent format for changelog entries (e.g., date, version, description of changes).
+* **Content:** Include a brief description of the changes, the affected files, and the reason for the change.
+
+### 6.3 Changelog Reading
+
+* **Rule:** The application should include a mechanism to read and display the contents of the `changelog.md` file, providing historical context for the project. This could be a dedicated page or a section within the application.
