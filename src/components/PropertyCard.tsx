@@ -1,70 +1,49 @@
 
-import { useState } from "react";
 import { Property } from "@/types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Star, Users } from "lucide-react";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookingDialog } from "./BookingDialog";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PropertyAvailability } from "./PropertyAvailability";
+import { useState } from "react";
 
-interface PropertyCardProps {
-  property: Property;
-}
-
-export const PropertyCard = ({ property }: PropertyCardProps) => {
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
-
+export const PropertyCard = ({ property }: { property: Property }) => {
+  const [showAvailability, setShowAvailability] = useState(false);
+  
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-lg">
-      <div className="aspect-video relative overflow-hidden">
-        <img 
-          src={property.images[0]} 
-          alt={property.title}
-          className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
-        />
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-sm font-medium">
-          ${property.price}/night
-        </div>
-      </div>
-      <CardHeader className="space-y-1">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl">{property.title}</CardTitle>
-          <div className="flex items-center space-x-1">
-            <Star className="w-4 h-4 fill-current text-yellow-400" />
-            <span className="text-sm font-medium">{property.rating}</span>
-          </div>
-        </div>
-        <CardDescription className="flex items-center space-x-2">
-          <MapPin className="w-4 h-4" />
-          <span>{property.location.city}, {property.location.state}</span>
-        </CardDescription>
+    <Card className="overflow-hidden">
+      <CardHeader className="p-0">
+        <AspectRatio ratio={16 / 9}>
+          <img
+            src={property.images[0]}
+            alt={property.title}
+            className="object-cover w-full h-full"
+          />
+        </AspectRatio>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4 text-sm text-gray-600">
-            <div className="flex items-center space-x-1">
-              <Users className="w-4 h-4" />
-              <span>Up to {property.maxGuests} guests</span>
-            </div>
-            <div>
-              {property.bedrooms} {property.bedrooms === 1 ? "bedroom" : "bedrooms"}
-            </div>
-            <div>
-              {property.baths} {property.baths === 1 ? "bath" : "baths"}
-            </div>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold">{property.title}</h3>
+          <span className="text-lg font-bold">${property.price}/night</span>
+        </div>
+        <p className="text-gray-600 mb-4">{property.description}</p>
+        <div className="flex items-center gap-2">
+          <Avatar>
+            <AvatarImage src={property.host.avatar} alt={property.host.name} />
+            <AvatarFallback>{property.host.name[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="text-sm font-medium">{property.host.name}</p>
+            <p className="text-xs text-gray-500">Host</p>
           </div>
-          <Button 
-            className="w-full"
-            onClick={() => setIsBookingOpen(true)}
-          >
-            Check Availability
-          </Button>
         </div>
       </CardContent>
-      <BookingDialog 
-        property={property}
-        open={isBookingOpen}
-        onOpenChange={setIsBookingOpen}
-      />
+      <CardFooter className="p-6 pt-0 flex-col gap-4">
+        <Button onClick={() => setShowAvailability(!showAvailability)} variant="outline" className="w-full">
+          {showAvailability ? "Hide Availability" : "Check Availability"}
+        </Button>
+        {showAvailability && <PropertyAvailability property={property} />}
+      </CardFooter>
     </Card>
   );
 };
