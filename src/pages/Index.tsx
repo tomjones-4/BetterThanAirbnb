@@ -4,16 +4,18 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, MapPin, Calendar, DollarSign } from "lucide-react";
 import { mockProperties } from "@/data/mockData";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Messages } from "@/components/Messages";
 import { MessageCircle } from "lucide-react";
 
 const Index = () => {
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Navigation />
-      
+
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4">
         <div className="container mx-auto text-center">
@@ -21,7 +23,8 @@ const Index = () => {
             Find Your Perfect Home Away from Home
           </h1>
           <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-fade-up">
-            Discover beautiful places to stay, connect with hosts, and book your next adventure with confidence.
+            Discover beautiful places to stay, connect with hosts, and book your
+            next adventure with confidence.
           </p>
           <div className="mb-12 animate-fade-up">
             <SearchBar />
@@ -58,23 +61,33 @@ const Index = () => {
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
                 <MapPin className="text-primary" size={24} />
               </div>
-              <h3 className="text-xl font-semibold">Find the Perfect Location</h3>
+              <h3 className="text-xl font-semibold">
+                Find the Perfect Location
+              </h3>
               <p className="text-gray-600">
-                Search properties in your desired location with our intuitive map interface.
+                Search properties in your desired location with our intuitive
+                map interface.
               </p>
             </div>
-            
-            <div className="glass-card p-6 rounded-2xl space-y-4 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+
+            <div
+              className="glass-card p-6 rounded-2xl space-y-4 animate-fade-up"
+              style={{ animationDelay: "0.2s" }}
+            >
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
                 <Calendar className="text-primary" size={24} />
               </div>
               <h3 className="text-xl font-semibold">Flexible Booking</h3>
               <p className="text-gray-600">
-                Book your stay with flexible dates and easy cancellation options.
+                Book your stay with flexible dates and easy cancellation
+                options.
               </p>
             </div>
-            
-            <div className="glass-card p-6 rounded-2xl space-y-4 animate-fade-up" style={{ animationDelay: "0.4s" }}>
+
+            <div
+              className="glass-card p-6 rounded-2xl space-y-4 animate-fade-up"
+              style={{ animationDelay: "0.4s" }}
+            >
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
                 <DollarSign className="text-primary" size={24} />
               </div>
