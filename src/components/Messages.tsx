@@ -1,19 +1,59 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Message } from "@/types";
-import { mockMessages, mockUsers } from "@/data/mockData";
 import { X } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
-export const Messages = () => {
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
+interface MessagesProps {
+  hostId: string;
+  propertyId: string;
+}
+
+export const Messages = ({ hostId, propertyId }: MessagesProps) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const { toast } = useToast();
-  const currentUserId = "u3"; // Normally this would come from auth
+  const currentUserId = "82c0b714-5e71-4b34-b2c3-916d69262916"; // Hardcoded for demo
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const { data, error } = await supabase
+        .from('fake_messages')
+        .select(`
+          id,
+          content,
+          created_at,
+          read,
+          sender:sender_id(id, name, avatar_url),
+          receiver:receiver_id(id, name, avatar_url)
+        `)
+        .or(`sender_id.eq.${currentUserId},receiver_id.eq.${currentUserId}`)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching messages:', error);
+        return;
+      }
+
+      const formattedMessages = data.map((msg: any) => ({
+        id: msg.id,
+        senderId: msg.sender.id,
+        receiverId: msg.receiver.id,
+        content: msg.content,
+        timestamp: msg.created_at,
+        read: msg.read,
+      }));
+
+      setMessages(formattedMessages);
+    };
+
+    fetchMessages();
+  }, [currentUserId]);
+
+  const handleSendMessage = async () => {
     if (!newMessage.trim()) {
       toast({
         title: "Error",
@@ -23,16 +63,39 @@ export const Messages = () => {
       return;
     }
 
-    const message: Message = {
-      id: `m${messages.length + 1}`,
+    const { data, error } = await supabase
+      .from('fake_messages')
+      .insert([
+        {
+          sender_id: currentUserId,
+          receiver_id: hostId,
+          content: newMessage,
+          read: false,
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newMsg: Message = {
+      id: data.id,
       senderId: currentUserId,
-      receiverId: "u1", // For demo, sending to first host
+      receiverId: hostId,
       content: newMessage,
-      timestamp: new Date().toISOString(),
+      timestamp: data.created_at,
       read: false,
     };
 
-    setMessages([...messages, message]);
+    setMessages([...messages, newMsg]);
     setNewMessage("");
     toast({
       title: "Success",
@@ -43,13 +106,15 @@ export const Messages = () => {
   return (
     <div className="h-full flex flex-col">
       <div className="p-4 border-b">
-        <h2 className="text-xl font-semibold">Messages</h2>
+        <h2 className="text-xl font-semibold">Message Host</h2>
+        <p className="text-sm text-muted-foreground">
+          Discuss your stay before booking
+        </p>
       </div>
       
       <div className="flex-1 overflow-y-auto p-4">
         <div className="space-y-4">
           {messages.map((message) => {
-            const sender = mockUsers.find(user => user.id === message.senderId);
             const isCurrentUser = message.senderId === currentUserId;
             
             return (
@@ -57,11 +122,6 @@ export const Messages = () => {
                 key={message.id}
                 className={`flex gap-2 ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                <img
-                  src={sender?.avatar}
-                  alt={sender?.name}
-                  className="w-8 h-8 rounded-full"
-                />
                 <div
                   className={`p-3 rounded-lg max-w-[80%] ${
                     isCurrentUser
@@ -69,7 +129,6 @@ export const Messages = () => {
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  <p className="text-sm font-medium mb-1">{sender?.name}</p>
                   <p className="text-sm">{message.content}</p>
                   <p className="text-xs opacity-75 mt-1">
                     {new Date(message.timestamp).toLocaleString()}
@@ -95,3 +154,4 @@ export const Messages = () => {
     </div>
   );
 };
+
