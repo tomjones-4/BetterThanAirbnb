@@ -38,10 +38,7 @@ export const Navigation = () => {
             {session ? (
               <>
                 <span>{session?.user?.email}</span>
-                <SignOut
-                  handleSignOut={handleSignOut}
-                  onSessionChange={() => {}}
-                />
+                <SignOut />
               </>
             ) : (
               <Button variant="default" onClick={handleSignIn}>
