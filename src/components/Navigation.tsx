@@ -1,29 +1,13 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Home, Search, User, Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SignOut } from "@/components/auth/SignOut";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
-
-  const handleSignIn = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-  };
+  const { session, handleSignIn, handleSignOut } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
@@ -54,7 +38,10 @@ export const Navigation = () => {
             {session ? (
               <>
                 <span>{session?.user?.email}</span>
-                <SignOut onSessionChange={setSession} />
+                <SignOut
+                  handleSignOut={handleSignOut}
+                  onSessionChange={() => {}}
+                />
               </>
             ) : (
               <Button variant="default" onClick={handleSignIn}>
