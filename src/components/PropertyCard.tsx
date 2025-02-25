@@ -16,7 +16,6 @@ interface PropertyCardProps {
 }
 
 export const PropertyCard = ({ property, onMouseEnter, onMouseLeave }: PropertyCardProps) => {
-  const [showAvailability, setShowAvailability] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   
   return (
@@ -63,7 +62,7 @@ export const PropertyCard = ({ property, onMouseEnter, onMouseLeave }: PropertyC
         </CardContent>
       </Link>
       <CardFooter className="px-1 pt-0">
-        {showAvailability && <PropertyAvailability property={property} />}
+        <PropertyAvailability property={property} />
       </CardFooter>
     </Card>
   );
