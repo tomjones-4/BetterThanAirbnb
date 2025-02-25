@@ -37,9 +37,9 @@ const Index = () => {
 
       <section className="bg-gray-50 py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <Card>
-              <CardContent className="p-6">
+          <div className="max-w-3xl mx-auto">
+            <Card className="shadow-lg">
+              <CardContent className="p-0">
                 <Messages hostId="d1c0b714-5e71-4b34-b2c3-916d69262915" propertyId="91c0b714-5e71-4b34-b2c3-916d69262917" />
               </CardContent>
             </Card>

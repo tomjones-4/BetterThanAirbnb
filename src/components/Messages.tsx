@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Message } from "@/types";
-import { X } from "lucide-react";
+import { ArrowRight, Clock, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 interface MessagesProps {
@@ -103,36 +103,64 @@ export const Messages = ({ hostId, propertyId }: MessagesProps) => {
     });
   };
 
+  const formatMessageTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 24) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffInHours < 48) {
+      return "Yesterday";
+    } else {
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+  };
+
   return (
-    <div className="h-full flex flex-col">
-      <div className="p-4 border-b">
-        <h2 className="text-xl font-semibold">Message Host</h2>
-        <p className="text-sm text-muted-foreground">
-          Discuss your stay before booking
+    <div className="flex flex-col h-[600px] bg-white rounded-lg">
+      <div className="px-6 py-4 border-b border-gray-200">
+        <h2 className="text-xl font-semibold text-gray-900">Messages</h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Response time: usually within an hour
         </p>
       </div>
       
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-4">
+      <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="space-y-6">
           {messages.map((message) => {
             const isCurrentUser = message.senderId === currentUserId;
             
             return (
               <div
                 key={message.id}
-                className={`flex gap-2 ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}
+                className={`flex gap-4 ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                <div
-                  className={`p-3 rounded-lg max-w-[80%] ${
-                    isCurrentUser
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  <p className="text-sm">{message.content}</p>
-                  <p className="text-xs opacity-75 mt-1">
-                    {new Date(message.timestamp).toLocaleString()}
-                  </p>
+                <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0" />
+                <div className={`flex flex-col max-w-[75%] ${isCurrentUser ? 'items-end' : 'items-start'}`}>
+                  <div
+                    className={`relative px-4 py-3 rounded-2xl ${
+                      isCurrentUser
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-50 text-gray-900'
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  </div>
+                  <div className="flex items-center gap-1 mt-1">
+                    <span className="text-xs text-gray-500">
+                      {formatMessageTime(message.timestamp)}
+                    </span>
+                    {isCurrentUser && (
+                      <span className="text-xs text-gray-500">
+                        {message.read ? (
+                          <Check className="w-3 h-3" />
+                        ) : (
+                          <Clock className="w-3 h-3" />
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -140,18 +168,23 @@ export const Messages = ({ hostId, propertyId }: MessagesProps) => {
         </div>
       </div>
 
-      <div className="p-4 border-t bg-white">
-        <div className="flex gap-2">
+      <div className="p-4 border-t border-gray-200">
+        <div className="relative">
           <Textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 resize-none"
+            className="pr-12 min-h-[100px] resize-none rounded-xl border-gray-300 focus:border-gray-400 focus:ring-0"
           />
-          <Button onClick={handleSendMessage}>Send</Button>
+          <Button
+            onClick={handleSendMessage}
+            className="absolute bottom-3 right-3 p-2 h-auto rounded-full"
+            size="icon"
+          >
+            <ArrowRight className="h-5 w-5" />
+          </Button>
         </div>
       </div>
     </div>
   );
 };
-
