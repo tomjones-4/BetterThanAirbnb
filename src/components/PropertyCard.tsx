@@ -7,44 +7,62 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PropertyAvailability } from "./PropertyAvailability";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
 
-export const PropertyCard = ({ property }: { property: Property }) => {
+interface PropertyCardProps {
+  property: Property;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+}
+
+export const PropertyCard = ({ property, onMouseEnter, onMouseLeave }: PropertyCardProps) => {
   const [showAvailability, setShowAvailability] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   
   return (
-    <Card className="overflow-hidden">
+    <Card 
+      className="overflow-hidden border-none shadow-none hover:shadow-lg transition-shadow duration-300"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <Link to={`/properties/${property.id}`}>
-        <CardHeader className="p-0">
-          <AspectRatio ratio={16 / 9}>
+        <CardHeader className="p-0 relative">
+          <AspectRatio ratio={1}>
             <img
               src={property.images[0]}
               alt={property.title}
-              className="object-cover w-full h-full hover:opacity-90 transition-opacity"
+              className="object-cover w-full h-full rounded-xl hover:opacity-90 transition-opacity"
             />
           </AspectRatio>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 hover:scale-110 transition-transform"
+            onClick={(e) => {
+              e.preventDefault();
+              setIsLiked(!isLiked);
+            }}
+          >
+            <Heart className={`h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+          </Button>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold">{property.title}</h3>
-            <span className="text-lg font-bold">${property.price}/night</span>
-          </div>
-          <p className="text-gray-600 mb-4">{property.description}</p>
-          <div className="flex items-center gap-2">
-            <Avatar>
-              <AvatarImage src={property.host.avatar} alt={property.host.name} />
-              <AvatarFallback>{property.host.name[0]}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-medium">{property.host.name}</p>
-              <p className="text-xs text-gray-500">Host</p>
+        <CardContent className="pt-4 px-1">
+          <div className="flex items-start justify-between mb-2">
+            <h3 className="text-lg font-semibold line-clamp-1">{property.title}</h3>
+            <div className="flex items-center gap-1">
+              <span>★</span>
+              <span className="font-medium">{property.rating}</span>
             </div>
           </div>
+          <p className="text-gray-500 text-sm mb-1">{property.location.city}, {property.location.state}</p>
+          <p className="text-gray-500 text-sm mb-2">Available dates</p>
+          <p>
+            <span className="font-semibold">${property.price}</span>
+            <span className="text-gray-500"> night</span>
+          </p>
         </CardContent>
       </Link>
-      <CardFooter className="p-6 pt-0 flex-col gap-4">
-        <Button onClick={() => setShowAvailability(!showAvailability)} variant="outline" className="w-full">
-          {showAvailability ? "Hide Availability" : "Check Availability"}
-        </Button>
+      <CardFooter className="px-1 pt-0">
         {showAvailability && <PropertyAvailability property={property} />}
       </CardFooter>
     </Card>
