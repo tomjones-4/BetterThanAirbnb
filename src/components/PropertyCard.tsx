@@ -1,13 +1,11 @@
 
 import { Property } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PropertyAvailability } from "./PropertyAvailability";
-import { useState } from "react";
+import { PropertyPrice } from "./PropertyPrice";
+import { LikeButton } from "./LikeButton";
 import { Link } from "react-router-dom";
-import { Heart } from "lucide-react";
 
 interface PropertyCardProps {
   property: Property;
@@ -15,8 +13,19 @@ interface PropertyCardProps {
   onMouseLeave?: () => void;
 }
 
-export const PropertyCard = ({ property, onMouseEnter, onMouseLeave }: PropertyCardProps) => {
-  const [isLiked, setIsLiked] = useState(false);
+export const PropertyCard = ({ 
+  property, 
+  onMouseEnter, 
+  onMouseLeave 
+}: PropertyCardProps) => {
+  const { 
+    id, 
+    images, 
+    title, 
+    rating, 
+    location, 
+    price 
+  } = property;
   
   return (
     <Card 
@@ -24,41 +33,30 @@ export const PropertyCard = ({ property, onMouseEnter, onMouseLeave }: PropertyC
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <Link to={`/properties/${property.id}`}>
+      <Link to={`/properties/${id}`}>
         <CardHeader className="p-0 relative">
           <AspectRatio ratio={1}>
             <img
-              src={property.images[0]}
-              alt={property.title}
+              src={images[0]}
+              alt={title}
               className="object-cover w-full h-full rounded-xl hover:opacity-90 transition-opacity"
             />
           </AspectRatio>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 hover:scale-110 transition-transform"
-            onClick={(e) => {
-              e.preventDefault();
-              setIsLiked(!isLiked);
-            }}
-          >
-            <Heart className={`h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : 'text-white'}`} />
-          </Button>
+          <LikeButton className="absolute top-2 right-2" />
         </CardHeader>
         <CardContent className="pt-4 px-1">
           <div className="flex items-start justify-between mb-2">
-            <h3 className="text-lg font-semibold line-clamp-1">{property.title}</h3>
+            <h3 className="text-lg font-semibold line-clamp-1">{title}</h3>
             <div className="flex items-center gap-1">
               <span>★</span>
-              <span className="font-medium">{property.rating}</span>
+              <span className="font-medium">{rating}</span>
             </div>
           </div>
-          <p className="text-gray-500 text-sm mb-1">{property.location.city}, {property.location.state}</p>
-          <p className="text-gray-500 text-sm mb-2">Available dates</p>
-          <p>
-            <span className="font-semibold">${property.price}</span>
-            <span className="text-gray-500"> night</span>
+          <p className="text-gray-500 text-sm mb-1">
+            {location.city}, {location.state}
           </p>
+          <p className="text-gray-500 text-sm mb-2">Available dates</p>
+          <PropertyPrice price={price} />
         </CardContent>
       </Link>
       <CardFooter className="px-1 pt-0">
