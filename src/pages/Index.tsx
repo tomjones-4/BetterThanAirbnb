@@ -2,8 +2,8 @@
 import { mockProperties } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Messages } from "@/components/Messages";
 import { PropertyCard } from "@/components/PropertyCard";
+import { SearchBar } from "@/components/SearchBar";
 
 const Index = () => {
   return (
@@ -18,7 +18,7 @@ const Index = () => {
               Discover and book unique accommodations around the world
             </p>
             <div className="mt-10">
-              <Button size="lg">Start Exploring</Button>
+              <SearchBar />
             </div>
           </div>
         </div>
@@ -31,18 +31,6 @@ const Index = () => {
             {mockProperties.slice(0, 3).map((property) => (
               <PropertyCard key={property.id} property={property} />
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <Card className="shadow-lg">
-              <CardContent className="p-0">
-                <Messages hostId="d1c0b714-5e71-4b34-b2c3-916d69262915" propertyId="91c0b714-5e71-4b34-b2c3-916d69262917" />
-              </CardContent>
-            </Card>
           </div>
         </div>
       </section>

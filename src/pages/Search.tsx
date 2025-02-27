@@ -4,9 +4,34 @@ import { mockProperties } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Sliders, Map } from "lucide-react";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { calculateDistance } from "@/utils/distance";
 
 const Search = () => {
   const [showMap, setShowMap] = useState(true);
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const location = params.get("location");
+  const radius = Number(params.get("radius")) || 10;
+
+  // Filter properties based on radius
+  // Note: In a real application, this would be done on the server side
+  const filteredProperties = mockProperties.filter((property) => {
+    if (!location) return true;
+    
+    // For demo purposes, we're using the first property's coordinates as the center
+    const centerLat = mockProperties[0].location.coordinates.lat;
+    const centerLng = mockProperties[0].location.coordinates.lng;
+    
+    const distance = calculateDistance(
+      centerLat,
+      centerLng,
+      property.location.coordinates.lat,
+      property.location.coordinates.lng
+    );
+    
+    return distance <= radius;
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -18,7 +43,7 @@ const Search = () => {
               Filters
             </Button>
             <span className="text-sm text-gray-500">
-              {mockProperties.length} stays found
+              {filteredProperties.length} stays found within {radius} miles
             </span>
           </div>
           <Button
@@ -31,7 +56,7 @@ const Search = () => {
           </Button>
         </div>
       </div>
-      <SearchResults properties={mockProperties} showMap={showMap} />
+      <SearchResults properties={filteredProperties} showMap={showMap} />
     </div>
   );
 };
