@@ -3,6 +3,7 @@ import { mockProperties } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PropertyCard } from "@/components/PropertyCard";
+import { SearchBar } from "@/components/SearchBar";
 
 const Index = () => {
   return (
@@ -17,7 +18,7 @@ const Index = () => {
               Discover and book unique accommodations around the world
             </p>
             <div className="mt-10">
-              <Button size="lg">Start Exploring</Button>
+              <SearchBar />
             </div>
           </div>
         </div>
