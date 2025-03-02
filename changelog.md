@@ -18,3 +18,10 @@
 - Implemented image upload functionality.
 - Created a listing page to display listing details.
 - Affected files: `src/components/AddListingDialog.tsx`, `src/components/Navigation.tsx`, `src/pages/listings/[listingId].tsx`
+
+## 2025-03-01 - Add Icons to Amenities in Add Listing Dialog
+
+- Added icons to the amenities displayed in the Add Listing Dialog for improved user experience.
+- Used lucide-react icons for each amenity.
+- Improved the layout of the amenities section in the Add Listing Dialog by using a grid layout with two columns and adjusting the spacing and alignment of the icons and text, and adding more padding between the checkbox and the icon/text.
+- Affected files: `src/components/AddListingDialog.tsx`

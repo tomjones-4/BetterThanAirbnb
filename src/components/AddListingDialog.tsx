@@ -22,6 +22,18 @@ import {
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { supabase } from "@/lib/supabase";
 import Spinner from "@/components/ui/spinner";
+import {
+  Wifi,
+  GlassWater,
+  ParkingSquare,
+  Utensils,
+  Shirt,
+  Dumbbell,
+  PawPrint,
+  Wind,
+  Flame,
+  Tv,
+} from "lucide-react";
 
 const AddListingDialog = () => {
   const [open, setOpen] = useState(false);
@@ -262,14 +274,17 @@ const AddListingDialog = () => {
           </div>
           <div className="grid gap-2">
             <Label>Amenities</Label>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="wifi"
                   checked={amenities.includes("Wi-Fi")}
                   onCheckedChange={() => handleAmenityChange("Wi-Fi")}
                 />
-                <Label htmlFor="wifi">Wi-Fi</Label>
+                <Label htmlFor="wifi" className="flex items-center ml-1">
+                  <Wifi className="mr-1 h-4 w-4" />
+                  Wi-Fi
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -277,7 +292,10 @@ const AddListingDialog = () => {
                   checked={amenities.includes("Pool")}
                   onCheckedChange={() => handleAmenityChange("Pool")}
                 />
-                <Label htmlFor="pool">Pool</Label>
+                <Label htmlFor="pool" className="flex items-center ml-1">
+                  <GlassWater className="mr-1 h-4 w-4" />
+                  Pool
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -285,7 +303,10 @@ const AddListingDialog = () => {
                   checked={amenities.includes("Parking")}
                   onCheckedChange={() => handleAmenityChange("Parking")}
                 />
-                <Label htmlFor="parking">Parking</Label>
+                <Label htmlFor="parking" className="flex items-center ml-1">
+                  <ParkingSquare className="mr-1 h-4 w-4" />
+                  Parking
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -293,7 +314,10 @@ const AddListingDialog = () => {
                   checked={amenities.includes("Kitchen")}
                   onCheckedChange={() => handleAmenityChange("Kitchen")}
                 />
-                <Label htmlFor="kitchen">Kitchen</Label>
+                <Label htmlFor="kitchen" className="flex items-center ml-1">
+                  <Utensils className="mr-1 h-4 w-4" />
+                  Kitchen
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -301,7 +325,10 @@ const AddListingDialog = () => {
                   checked={amenities.includes("Laundry")}
                   onCheckedChange={() => handleAmenityChange("Laundry")}
                 />
-                <Label htmlFor="laundry">Laundry</Label>
+                <Label htmlFor="laundry" className="flex items-center ml-1">
+                  <Shirt className="mr-1 h-4 w-4" />
+                  Laundry
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -309,7 +336,10 @@ const AddListingDialog = () => {
                   checked={amenities.includes("Gym")}
                   onCheckedChange={() => handleAmenityChange("Gym")}
                 />
-                <Label htmlFor="gym">Gym</Label>
+                <Label htmlFor="gym" className="flex items-center ml-1">
+                  <Dumbbell className="mr-1 h-4 w-4" />
+                  Gym
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -317,7 +347,10 @@ const AddListingDialog = () => {
                   checked={amenities.includes("Pet Friendly")}
                   onCheckedChange={() => handleAmenityChange("Pet Friendly")}
                 />
-                <Label htmlFor="petFriendly">Pet Friendly</Label>
+                <Label htmlFor="petFriendly" className="flex items-center ml-1">
+                  <PawPrint className="mr-1 h-4 w-4" />
+                  Pet Friendly
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -327,7 +360,13 @@ const AddListingDialog = () => {
                     handleAmenityChange("Air Conditioning")
                   }
                 />
-                <Label htmlFor="airConditioning">Air Conditioning</Label>
+                <Label
+                  htmlFor="airConditioning"
+                  className="flex items-center ml-1"
+                >
+                  <Wind className="mr-1 h-4 w-4" />
+                  Air Conditioning
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -335,7 +374,10 @@ const AddListingDialog = () => {
                   checked={amenities.includes("Heating")}
                   onCheckedChange={() => handleAmenityChange("Heating")}
                 />
-                <Label htmlFor="heating">Heating</Label>
+                <Label htmlFor="heating" className="flex items-center ml-1">
+                  <Flame className="mr-1 h-4 w-4" />
+                  Heating
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -343,7 +385,10 @@ const AddListingDialog = () => {
                   checked={amenities.includes("TV")}
                   onCheckedChange={() => handleAmenityChange("TV")}
                 />
-                <Label htmlFor="tv">TV</Label>
+                <Label htmlFor="tv" className="flex items-center ml-1">
+                  <Tv className="mr-1 h-4 w-4" />
+                  TV
+                </Label>
               </div>
             </div>
           </div>
