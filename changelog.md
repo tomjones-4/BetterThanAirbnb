@@ -8,3 +8,13 @@
 - Moved the handleSignOut function to the useAuth hook.
 - Implemented code splitting for the SignOut component.
 - Affected files: `src/components/Navigation.tsx`, `src/components/auth/SignOut.tsx`, `src/hooks/useAuth.tsx`, `src/components/auth/SignOutButton.tsx`
+
+## 2025-03-01 - Add Property Listing Feature
+
+- Implemented a feature to allow users to add property listings to the website.
+- Added an "Add Listing" button to the navigation bar that launches a modal.
+- Implemented a modal with a form for adding property listings.
+- Integrated the form with Supabase to save listing data.
+- Implemented image upload functionality.
+- Created a listing page to display listing details.
+- Affected files: `src/components/AddListingDialog.tsx`, `src/components/Navigation.tsx`, `src/pages/listings/[listingId].tsx`
