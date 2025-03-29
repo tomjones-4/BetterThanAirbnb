@@ -99,12 +99,6 @@ export const Navigation = () => {
               </Button>
             )}
             <AddListingDialog />
-            <Link
-              to="/changelog"
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <span>Changelog</span>
-            </Link>
           </div>
 
           {/* Mobile Menu Button */}
