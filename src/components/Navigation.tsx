@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Home, Search, MessageSquare, Menu, X, User } from "lucide-react";
@@ -14,12 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Messages } from "./Messages";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import AddListingDialog from "./AddListingDialog";
 
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -70,7 +66,10 @@ export const Navigation = () => {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <Dialog open={isMessagesOpen} onOpenChange={setIsMessagesOpen}>
+                  <Dialog
+                    open={isMessagesOpen}
+                    onOpenChange={setIsMessagesOpen}
+                  >
                     <DialogTrigger asChild>
                       <DropdownMenuItem>
                         <MessageSquare className="mr-2 h-4 w-4" />
@@ -99,6 +98,13 @@ export const Navigation = () => {
                 Sign In
               </Button>
             )}
+            <AddListingDialog />
+            <Link
+              to="/changelog"
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <span>Changelog</span>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -141,6 +147,12 @@ export const Navigation = () => {
                 </span>
               </Button>
             )}
+            <Link
+              to="/changelog"
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <span>Changelog</span>
+            </Link>
           </div>
         </div>
       )}
