@@ -34,6 +34,7 @@ import {
   Flame,
   Tv,
 } from "lucide-react";
+// Removed unused hooks: usePhotoManagement, useFirebaseImageUpload
 
 const AddListingDialog = () => {
   const [open, setOpen] = useState(false);
@@ -42,13 +43,15 @@ const AddListingDialog = () => {
   const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
   const [toDate, setToDate] = useState<Date | undefined>(undefined);
   const [amenities, setAmenities] = useState<string[]>([]);
-  const [photos, setPhotos] = useState<File[]>([]);
+  const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]); // State for selected files
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]); // State for previews
 
   const [addressError, setAddressError] = useState<string | null>(null);
   const [priceError, setPriceError] = useState<string | null>(null);
   const [fromDateError, setFromDateError] = useState<string | null>(null);
   const [toDateError, setToDateError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null); // General form error
 
   const handleAmenityChange = (amenity: string) => {
     if (amenities.includes(amenity)) {
@@ -58,120 +61,144 @@ const AddListingDialog = () => {
     }
   };
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle file selection and preview generation
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormError(null); // Clear previous errors
     if (e.target.files) {
-      const files = Array.from(e.target.files);
-      const maxSize = 2 * 1024 * 1024; // 2MB
-
-      const validFiles = files.filter((file) => {
-        if (file.size > maxSize) {
-          alert("Image size must be less than 2MB");
-          return false;
-        }
-        return true;
-      });
-      setPhotos(validFiles);
-    }
-  };
-
-  const uploadPhotos = async (photos: File[]) => {
-    const photoUrls: string[] = [];
-    for (const photo of photos) {
-      const { data, error } = await supabase.storage
-        .from("listings")
-        .upload(`${address}/${photo.name}`, photo, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (error) {
-        console.error("Error uploading photo:", error);
-        // TODO: Display user-friendly error message
-        alert("Failed to upload photo. Please try again.");
-        return null;
-      } else {
-        console.log("Photo uploaded:", data);
-        // TODO: Get the correct URL from the data object
-        const url = `https://betterthanairbnb.supabase.co/storage/v1/object/public/${data.path}`;
-        photoUrls.push(url);
+      const filesArray = Array.from(e.target.files);
+      // Basic validation (e.g., limit number of files)
+      if (filesArray.length > 5) {
+        setFormError("You can upload a maximum of 5 photos.");
+        setSelectedPhotos([]);
+        setPhotoPreviews([]);
+        e.target.value = ""; // Clear the input
+        return;
       }
+      setSelectedPhotos(filesArray);
+
+      // Generate previews
+      const previews = filesArray.map((file) => URL.createObjectURL(file));
+      setPhotoPreviews(previews);
     }
-    return photoUrls;
   };
+
+  // Clean up previews when component unmounts or files change
+  React.useEffect(() => {
+    return () => {
+      photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [photoPreviews]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null); // Clear previous errors
 
+    // --- Form Validation ---
     let isValid = true;
-
     if (!address) {
       setAddressError("Address is required");
       isValid = false;
     } else {
       setAddressError(null);
     }
-
     if (!price) {
       setPriceError("Price is required");
       isValid = false;
     } else {
       setPriceError(null);
     }
-
     if (!fromDate) {
       setFromDateError("From Date is required");
       isValid = false;
     } else {
       setFromDateError(null);
     }
-
     if (!toDate) {
       setToDateError("To Date is required");
       isValid = false;
     } else {
       setToDateError(null);
     }
+    // Add validation for photos if needed (e.g., at least one photo)
+    // if (selectedPhotos.length === 0) { setFormError("Please upload at least one photo."); isValid = false; }
 
     if (!isValid) {
       return;
     }
+    // --- End Validation ---
 
     setLoading(true);
 
     try {
-      // Upload photos
-      const photoUrls = await uploadPhotos(photos);
-      let photo_urls = [];
-      if (photoUrls) {
-        photo_urls = photoUrls;
+      // 1. Create FormData
+      const formData = new FormData();
+      formData.append("address", address);
+      formData.append("price", price);
+      formData.append("fromDate", fromDate.toISOString());
+      formData.append("toDate", toDate.toISOString());
+      formData.append("amenities", JSON.stringify(amenities)); // Send amenities as JSON string
+
+      // Append each photo file
+      selectedPhotos.forEach((photo) => {
+        formData.append("photos", photo);
+      });
+
+      // 2. Get Auth Token (Important for Edge Function security)
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        throw new Error(sessionError?.message || "User not authenticated");
       }
 
-      const { data, error } = await supabase
-        .from("listings")
-        .insert([
-          {
-            address,
-            price: parseInt(price),
-            from_date: fromDate.toISOString(),
-            to_date: toDate.toISOString(),
-            amenities,
-            photo_urls: photo_urls,
+      // 3. Invoke the Edge Function
+      const { data, error } = await supabase.functions.invoke(
+        "create-listing-with-photos",
+        {
+          body: formData, // Pass FormData directly
+          headers: {
+            // Pass the Authorization header for user authentication within the function
+            Authorization: `Bearer ${session.access_token}`,
           },
-        ])
-        .select();
+          // Note: Supabase client might handle Content-Type automatically for FormData
+        }
+      );
 
       if (error) {
-        console.error("Supabase error:", error);
-        // TODO: Display user-friendly error message
-        alert("Failed to create listing. Please try again.");
-      } else {
-        console.log("Listing created:", data);
-        // Redirect to listing page
-        window.location.href = `/listings/${address}`;
+        console.error("Edge Function invocation error:", error);
+        setFormError(`Failed to create listing: ${error.message}`);
+        throw error; // Re-throw to be caught by outer catch
       }
+
+      if (data?.error) {
+        console.error(
+          "Edge Function returned error:",
+          data.error,
+          data.details
+        );
+        setFormError(
+          `Failed to create listing: ${data.error} ${
+            data.details ? `(${data.details})` : ""
+          }`
+        );
+        throw new Error(data.error);
+      }
+
+      // 4. Handle Success
+      console.log("Edge Function success response:", data);
+      alert("Listing created successfully!"); // Replace with better UI feedback (e.g., toast)
+      setOpen(false); // Close the dialog
+      // Optionally redirect or refresh data
+      // window.location.href = `/listings/${data.listingId}`; // Redirect using returned ID if needed
     } catch (error) {
-      console.error("Error:", error);
-      alert("An unexpected error occurred. Please try again.");
+      console.error("Error in handleSubmit:", error);
+      // Ensure formError is set if not already
+      if (!formError) {
+        setFormError(
+          `An unexpected error occurred: ${(error as Error).message}`
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -190,6 +217,7 @@ const AddListingDialog = () => {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+          {/* Address, Price, Dates, Amenities Inputs (remain the same) */}
           <div className="grid gap-2">
             <Label htmlFor="address">Address</Label>
             <Input
@@ -199,18 +227,21 @@ const AddListingDialog = () => {
               onChange={(e) => setAddress(e.target.value)}
               required
             />
-            {addressError && <p className="text-red-500">{addressError}</p>}
+            {addressError && (
+              <p className="text-red-500 text-sm">{addressError}</p>
+            )}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="price">Price</Label>
+            <Label htmlFor="price">Price per night ($)</Label>
             <Input
               type="number"
               id="price"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               required
+              min="0"
             />
-            {priceError && <p className="text-red-500">{priceError}</p>}
+            {priceError && <p className="text-red-500 text-sm">{priceError}</p>}
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
@@ -220,7 +251,7 @@ const AddListingDialog = () => {
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-[140px] justify-start text-left font-normal",
+                      "w-full justify-start text-left font-normal", // Changed width
                       !fromDate && "text-muted-foreground"
                     )}
                   >
@@ -242,7 +273,9 @@ const AddListingDialog = () => {
                   />
                 </PopoverContent>
               </Popover>
-              {fromDateError && <p className="text-red-500">{fromDateError}</p>}
+              {fromDateError && (
+                <p className="text-red-500 text-sm">{fromDateError}</p>
+              )}
             </div>
             <div>
               <Label>To Date</Label>
@@ -251,7 +284,7 @@ const AddListingDialog = () => {
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-[140px] justify-start text-left font-normal",
+                      "w-full justify-start text-left font-normal", // Changed width
                       !toDate && "text-muted-foreground"
                     )}
                   >
@@ -269,152 +302,79 @@ const AddListingDialog = () => {
                   />
                 </PopoverContent>
               </Popover>
-              {toDateError && <p className="text-red-500">{toDateError}</p>}
+              {toDateError && (
+                <p className="text-red-500 text-sm">{toDateError}</p>
+              )}
             </div>
           </div>
           <div className="grid gap-2">
             <Label>Amenities</Label>
             <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="wifi"
-                  checked={amenities.includes("Wi-Fi")}
-                  onCheckedChange={() => handleAmenityChange("Wi-Fi")}
-                />
-                <Label htmlFor="wifi" className="flex items-center ml-1">
-                  <Wifi className="mr-1 h-4 w-4" />
-                  Wi-Fi
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="pool"
-                  checked={amenities.includes("Pool")}
-                  onCheckedChange={() => handleAmenityChange("Pool")}
-                />
-                <Label htmlFor="pool" className="flex items-center ml-1">
-                  <GlassWater className="mr-1 h-4 w-4" />
-                  Pool
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="parking"
-                  checked={amenities.includes("Parking")}
-                  onCheckedChange={() => handleAmenityChange("Parking")}
-                />
-                <Label htmlFor="parking" className="flex items-center ml-1">
-                  <ParkingSquare className="mr-1 h-4 w-4" />
-                  Parking
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="kitchen"
-                  checked={amenities.includes("Kitchen")}
-                  onCheckedChange={() => handleAmenityChange("Kitchen")}
-                />
-                <Label htmlFor="kitchen" className="flex items-center ml-1">
-                  <Utensils className="mr-1 h-4 w-4" />
-                  Kitchen
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="laundry"
-                  checked={amenities.includes("Laundry")}
-                  onCheckedChange={() => handleAmenityChange("Laundry")}
-                />
-                <Label htmlFor="laundry" className="flex items-center ml-1">
-                  <Shirt className="mr-1 h-4 w-4" />
-                  Laundry
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="gym"
-                  checked={amenities.includes("Gym")}
-                  onCheckedChange={() => handleAmenityChange("Gym")}
-                />
-                <Label htmlFor="gym" className="flex items-center ml-1">
-                  <Dumbbell className="mr-1 h-4 w-4" />
-                  Gym
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="petFriendly"
-                  checked={amenities.includes("Pet Friendly")}
-                  onCheckedChange={() => handleAmenityChange("Pet Friendly")}
-                />
-                <Label htmlFor="petFriendly" className="flex items-center ml-1">
-                  <PawPrint className="mr-1 h-4 w-4" />
-                  Pet Friendly
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="airConditioning"
-                  checked={amenities.includes("Air Conditioning")}
-                  onCheckedChange={() =>
-                    handleAmenityChange("Air Conditioning")
-                  }
-                />
-                <Label
-                  htmlFor="airConditioning"
-                  className="flex items-center ml-1"
-                >
-                  <Wind className="mr-1 h-4 w-4" />
-                  Air Conditioning
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="heating"
-                  checked={amenities.includes("Heating")}
-                  onCheckedChange={() => handleAmenityChange("Heating")}
-                />
-                <Label htmlFor="heating" className="flex items-center ml-1">
-                  <Flame className="mr-1 h-4 w-4" />
-                  Heating
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="tv"
-                  checked={amenities.includes("TV")}
-                  onCheckedChange={() => handleAmenityChange("TV")}
-                />
-                <Label htmlFor="tv" className="flex items-center ml-1">
-                  <Tv className="mr-1 h-4 w-4" />
-                  TV
-                </Label>
-              </div>
+              {/* Amenity Checkboxes */}
+              {[
+                { id: "wifi", label: "Wi-Fi", icon: Wifi },
+                { id: "pool", label: "Pool", icon: GlassWater },
+                { id: "parking", label: "Parking", icon: ParkingSquare },
+                { id: "kitchen", label: "Kitchen", icon: Utensils },
+                { id: "laundry", label: "Laundry", icon: Shirt },
+                { id: "gym", label: "Gym", icon: Dumbbell },
+                { id: "petFriendly", label: "Pet Friendly", icon: PawPrint },
+                {
+                  id: "airConditioning",
+                  label: "Air Conditioning",
+                  icon: Wind,
+                },
+                { id: "heating", label: "Heating", icon: Flame },
+                { id: "tv", label: "TV", icon: Tv },
+              ].map((amenity) => (
+                <div key={amenity.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={amenity.id}
+                    checked={amenities.includes(amenity.label)}
+                    onCheckedChange={() => handleAmenityChange(amenity.label)}
+                  />
+                  <Label
+                    htmlFor={amenity.id}
+                    className="flex items-center ml-1 text-sm font-normal"
+                  >
+                    <amenity.icon className="mr-1 h-4 w-4" />
+                    {amenity.label}
+                  </Label>
+                </div>
+              ))}
             </div>
           </div>
+
+          {/* Updated Photos Input */}
           <div className="grid gap-2">
-            <Label htmlFor="photos">Photos</Label>
+            <Label htmlFor="photos">Photos (up to 5)</Label>
             <Input
               type="file"
               id="photos"
               multiple
-              onChange={handlePhotoChange}
+              accept="image/*" // Accept only image files
+              onChange={handleFileChange} // Use the new handler
             />
-            {photos.length > 0 && (
-              <div className="flex gap-2">
-                {photos.map((photo, index) => (
+            {/* Display Previews */}
+            {photoPreviews.length > 0 && (
+              <div className="flex gap-2 flex-wrap mt-2">
+                {photoPreviews.map((previewUrl, index) => (
                   <img
                     key={index}
-                    src={URL.createObjectURL(photo)}
-                    alt={photo.name}
-                    className="w-20 h-20 object-cover rounded-md"
+                    src={previewUrl}
+                    alt={`Preview ${index + 1}`}
+                    className="w-20 h-20 object-cover rounded-md border"
                   />
                 ))}
               </div>
             )}
           </div>
-          <Button type="submit" disabled={loading}>
-            {loading ? <Spinner /> : "Submit"}
+
+          {/* Display general form error */}
+          {formError && <p className="text-red-500 text-sm">{formError}</p>}
+
+          <Button type="submit" disabled={loading} className="w-full mt-2">
+            {loading ? <Spinner /> : "Create Listing"}
           </Button>
         </form>
       </DialogContent>

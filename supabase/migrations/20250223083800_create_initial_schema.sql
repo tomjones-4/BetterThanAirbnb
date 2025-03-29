@@ -13,7 +13,10 @@ CREATE TABLE listings (
   bedrooms INTEGER,
   bathrooms INTEGER,
   max_guests INTEGER,
-  host_id UUID REFERENCES auth.users(id) -- Assuming you will use Supabase auth users table
+  host_id UUID REFERENCES auth.users(id), -- Assuming you will use Supabase auth users table
+  address TEXT,
+  price NUMERIC,
+  property_type VARCHAR(50)
 );
 
 -- Bookings table
@@ -32,7 +35,8 @@ CREATE TABLE bookings (
 CREATE TABLE images (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   listing_id UUID NOT NULL REFERENCES listings(id),
-  image_url VARCHAR(255) NOT NULL
+  image_url VARCHAR(255) NOT NULL,
+  image_path VARCHAR(255)
 );
 
 -- Users profile table (Optional - you can also directly use auth.users table)
