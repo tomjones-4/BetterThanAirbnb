@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
   DialogContent,
@@ -177,10 +178,23 @@ const AddListingDialog = () => {
     }
   };
 
+  const { session, handleSignIn } = useAuth();
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Add Listing</Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            if (!session) {
+              handleSignIn();
+            } else {
+              setOpen(true);
+            }
+          }}
+        >
+          Add Listing
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

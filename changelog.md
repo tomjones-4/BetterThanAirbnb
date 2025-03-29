@@ -25,3 +25,9 @@
 - Used lucide-react icons for each amenity.
 - Improved the layout of the amenities section in the Add Listing Dialog by using a grid layout with two columns and adjusting the spacing and alignment of the icons and text, and adding more padding between the checkbox and the icon/text.
 - Affected files: `src/components/AddListingDialog.tsx`
+
+## 2025-03-29 - Require Login to Add Listing
+
+- Updated the "Add Listing" button to require users to log in before accessing the add listing form.
+- If a user is not logged in, clicking the "Add Listing" button will now trigger the Google OAuth sign-in flow.
+- Affected files: `src/components/AddListingDialog.tsx`
