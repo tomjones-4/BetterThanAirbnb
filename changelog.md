@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+- Updated homepage to two-column layout
+- Removed "Featured Properties" heading
+- Display all properties instead of slicing
+- Made left side fixed and centered
+- Removed calendar and large layout elements from listings
+- Simplified property display to show main image and key details
+- Fixed overlap with navigation bar by adding top padding to the home page
+- Added fallback images for unavailable property images
+- Display up to ten properties for scrolling demo
+
 ## 2025-02-23 - Refactor Authentication Flow
 
 - Refactored authentication to use Google OAuth in the navigation bar, replacing the separate sign-in/sign-up routes and modal.
