@@ -16,9 +16,11 @@ interface Message {
 
 interface MessagesProps {
   onClose?: () => void;
+  hostId?: string;
+  propertyId?: string;
 }
 
-export const Messages = ({ onClose }: MessagesProps) => {
+export const Messages = ({ onClose, hostId, propertyId }: MessagesProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -80,7 +82,10 @@ export const Messages = ({ onClose }: MessagesProps) => {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Messages</h2>
+        <h2 className="text-lg font-semibold">
+          {propertyId ? "Property Inquiry" : "Messages"}
+          {hostId && !propertyId && ` with ${hostId}`}
+        </h2>
         {onClose && (
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
