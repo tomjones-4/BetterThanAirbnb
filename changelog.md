@@ -1,10 +1,19 @@
-# Changelog
+## 2025-03-31
 
-## 2025-03-31 - Fix Add Listing Amenity Selection
+- Updated the Add Listing form to include all fields from the database schema.
+  - Modified `src/hooks/useAddListingForm.tsx` to update the Zod schema and onSubmit function.
+  - Modified `src/components/AddListingDialog.tsx` to include new input fields.
+- Updated the listing route to display a summary of the listing data in a Card component.
+  - Modified `src/pages/listings/[listingId].tsx` to fetch listing data by ID and display it in a Card.
+- Improved styling and scrollability of the Add Listing form.
 
-- Refactored the amenity checkboxes in the `AddListingDialog` component to correctly use the `Controller` component from `react-hook-form`, resolving an issue where selections were not being registered.
-- Defined a structured `amenitiesList` array in `AddListingDialog.tsx` to manage amenity data and icons.
-- Removed the unused `handleAmenityChange` function from the `useAddListingForm` hook.
+  - Modified `src/components/AddListingDialog.tsx` to increase the width of the dialog and add a scroll area.
+
+- Updated the Add Listing form to include all fields from the database schema.
+  - Modified `src/hooks/useAddListingForm.tsx` to update the Zod schema and onSubmit function.
+  - Modified `src/components/AddListingDialog.tsx` to include new input fields.
+- Updated the listing route to display a summary of the listing data in a Card component.
+  - Modified `src/pages/listings/[listingId].tsx` to fetch listing data by ID and display it in a Card.
 - Fixed a TypeScript error in `useAddListingForm` related to variable shadowing within the `uploadPhotos` function.
 - Affected files: `src/components/AddListingDialog.tsx`, `src/hooks/useAddListingForm.tsx`
 
