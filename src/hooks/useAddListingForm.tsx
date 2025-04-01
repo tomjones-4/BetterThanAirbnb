@@ -97,8 +97,8 @@ const useAddListingForm = () => {
           {
             address: data.address,
             price: parseInt(data.price),
-            from_date: data.fromDate.toISOString(),
-            to_date: data.toDate.toISOString(),
+            start_date: data.fromDate.toISOString(),
+            end_date: data.toDate.toISOString(),
             amenities: data.amenities,
             photo_urls: photo_urls,
           },

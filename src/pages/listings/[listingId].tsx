@@ -36,8 +36,8 @@ const ListingPage = () => {
       <h1>Listing Details</h1>
       <p>Address: {listing.address}</p>
       <p>Price: {listing.price}</p>
-      <p>From Date: {listing.from_date}</p>
-      <p>To Date: {listing.to_date}</p>
+      <p>From Date: {listing.start_date}</p>
+      <p>To Date: {listing.end_date}</p>
       <p>Amenities: {listing.amenities.join(", ")}</p>
       {listing.photo_urls.map((url, index) => (
         <img key={index} src={url} alt={`Listing Photo ${index + 1}`} />
