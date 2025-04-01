@@ -36,35 +36,21 @@ import {
   Tv,
 } from "lucide-react";
 import useAddListingForm from "@/hooks/useAddListingForm";
+import { Controller } from "react-hook-form";
 
 const AddListingDialog = () => {
   const [open, setOpen] = useState(false);
   const { session, handleSignIn } = useAuth();
   const {
-    address,
-    setAddress,
-    price,
-    setPrice,
-    fromDate,
-    setFromDate,
-    toDate,
-    setToDate,
-    amenities,
-    setAmenities,
-    photos,
-    setPhotos,
-    addressError,
-    setAddressError,
-    priceError,
-    setPriceError,
-    fromDateError,
-    setFromDateError,
-    toDateError,
-    setToDateError,
-    loading,
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    errors,
+    isSubmitting,
     handleAmenityChange,
     handlePhotoChange,
-    handleSubmit,
+    loading,
   } = useAddListingForm();
 
   return (
@@ -93,84 +79,104 @@ const AddListingDialog = () => {
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="address">Address</Label>
-            <Input
-              type="text"
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              required
-            />
-            {addressError && <p className="text-red-500">{addressError}</p>}
+            <Input type="text" id="address" {...register("address")} required />
+            {errors.address && (
+              <p className="text-red-500">{errors.address.message}</p>
+            )}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="price">Price</Label>
-            <Input
-              type="number"
-              id="price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
-            />
-            {priceError && <p className="text-red-500">{priceError}</p>}
+            <Input type="number" id="price" {...register("price")} required />
+            {errors.price && (
+              <p className="text-red-500">{errors.price?.message}</p>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <Label>From Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-[140px] justify-start text-left font-normal",
-                      !fromDate && "text-muted-foreground"
-                    )}
-                  >
-                    {fromDate ? (
-                      format(fromDate, "PPP")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={fromDate}
-                    onSelect={setFromDate}
-                    disabled={toDate ? { after: toDate } : undefined}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              {fromDateError && <p className="text-red-500">{fromDateError}</p>}
+              <Controller
+                control={control}
+                name="fromDate"
+                render={({ field }) => (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[140px] justify-start text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={
+                          control._formValues.toDate
+                            ? { after: control._formValues.toDate }
+                            : undefined
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+              />
+              {errors.fromDate && (
+                <p className="text-red-500">{errors.fromDate?.message}</p>
+              )}
             </div>
             <div>
               <Label>To Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-[140px] justify-start text-left font-normal",
-                      !toDate && "text-muted-foreground"
-                    )}
-                  >
-                    {toDate ? format(toDate, "PPP") : <span>Pick a date</span>}
-                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={toDate}
-                    onSelect={setToDate}
-                    disabled={fromDate ? { before: fromDate } : undefined}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              {toDateError && <p className="text-red-500">{toDateError}</p>}
+              <Controller
+                control={control}
+                name="toDate"
+                render={({ field }) => (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[140px] justify-start text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={
+                          control._formValues.fromDate
+                            ? { before: control._formValues.fromDate }
+                            : undefined
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+              />
+              {errors.toDate && (
+                <p className="text-red-500">{errors.toDate?.message}</p>
+              )}
             </div>
           </div>
           <div className="grid gap-2">
@@ -179,7 +185,7 @@ const AddListingDialog = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="wifi"
-                  checked={amenities.includes("Wi-Fi")}
+                  checked={control._formValues.amenities?.includes("Wi-Fi")}
                   onCheckedChange={() => handleAmenityChange("Wi-Fi")}
                 />
                 <Label htmlFor="wifi" className="flex items-center ml-1">
@@ -190,7 +196,7 @@ const AddListingDialog = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="pool"
-                  checked={amenities.includes("Pool")}
+                  checked={control._formValues.amenities?.includes("Pool")}
                   onCheckedChange={() => handleAmenityChange("Pool")}
                 />
                 <Label htmlFor="pool" className="flex items-center ml-1">
@@ -201,7 +207,7 @@ const AddListingDialog = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="parking"
-                  checked={amenities.includes("Parking")}
+                  checked={control._formValues.amenities?.includes("Parking")}
                   onCheckedChange={() => handleAmenityChange("Parking")}
                 />
                 <Label htmlFor="parking" className="flex items-center ml-1">
@@ -212,7 +218,7 @@ const AddListingDialog = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="kitchen"
-                  checked={amenities.includes("Kitchen")}
+                  checked={control._formValues.amenities?.includes("Kitchen")}
                   onCheckedChange={() => handleAmenityChange("Kitchen")}
                 />
                 <Label htmlFor="kitchen" className="flex items-center ml-1">
@@ -223,7 +229,7 @@ const AddListingDialog = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="laundry"
-                  checked={amenities.includes("Laundry")}
+                  checked={control._formValues.amenities?.includes("Laundry")}
                   onCheckedChange={() => handleAmenityChange("Laundry")}
                 />
                 <Label htmlFor="laundry" className="flex items-center ml-1">
@@ -234,7 +240,7 @@ const AddListingDialog = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="gym"
-                  checked={amenities.includes("Gym")}
+                  checked={control._formValues.amenities?.includes("Gym")}
                   onCheckedChange={() => handleAmenityChange("Gym")}
                 />
                 <Label htmlFor="gym" className="flex items-center ml-1">
@@ -245,7 +251,9 @@ const AddListingDialog = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="petFriendly"
-                  checked={amenities.includes("Pet Friendly")}
+                  checked={control._formValues.amenities?.includes(
+                    "Pet Friendly"
+                  )}
                   onCheckedChange={() => handleAmenityChange("Pet Friendly")}
                 />
                 <Label htmlFor="petFriendly" className="flex items-center ml-1">
@@ -256,7 +264,9 @@ const AddListingDialog = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="airConditioning"
-                  checked={amenities.includes("Air Conditioning")}
+                  checked={control._formValues.amenities?.includes(
+                    "Air Conditioning"
+                  )}
                   onCheckedChange={() =>
                     handleAmenityChange("Air Conditioning")
                   }
@@ -272,7 +282,7 @@ const AddListingDialog = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="heating"
-                  checked={amenities.includes("Heating")}
+                  checked={control._formValues.amenities?.includes("Heating")}
                   onCheckedChange={() => handleAmenityChange("Heating")}
                 />
                 <Label htmlFor="heating" className="flex items-center ml-1">
@@ -283,7 +293,7 @@ const AddListingDialog = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="tv"
-                  checked={amenities.includes("TV")}
+                  checked={control._formValues.amenities?.includes("TV")}
                   onCheckedChange={() => handleAmenityChange("TV")}
                 />
                 <Label htmlFor="tv" className="flex items-center ml-1">
@@ -301,7 +311,7 @@ const AddListingDialog = () => {
               multiple
               onChange={handlePhotoChange}
             />
-            {photos.length > 0 && (
+            {/* {photos.length > 0 && (
               <div className="flex gap-2">
                 {photos.map((photo, index) => (
                   <img
@@ -312,9 +322,9 @@ const AddListingDialog = () => {
                   />
                 ))}
               </div>
-            )}
+            )} */}
           </div>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={isSubmitting}>
             {loading ? <Spinner /> : "Submit"}
           </Button>
         </form>

@@ -1,17 +1,5 @@
 # Changelog
 
-## [Unreleased]
-
-- Updated homepage to two-column layout
-- Removed "Featured Properties" heading
-- Display all properties instead of slicing
-- Made left side fixed and centered
-- Removed calendar and large layout elements from listings
-- Simplified property display to show main image and key details
-- Fixed overlap with navigation bar by adding top padding to the home page
-- Added fallback images for unavailable property images
-- Display up to ten properties for scrolling demo
-
 ## 2025-02-23 - Refactor Authentication Flow
 
 - Refactored authentication to use Google OAuth in the navigation bar, replacing the separate sign-in/sign-up routes and modal.
@@ -43,3 +31,23 @@
 - Updated the "Add Listing" button to require users to log in before accessing the add listing form.
 - If a user is not logged in, clicking the "Add Listing" button will now trigger the Google OAuth sign-in flow.
 - Affected files: `src/components/AddListingDialog.tsx`
+
+## 2025-03-29
+
+- Updated homepage to two-column layout
+- Removed "Featured Properties" heading
+- Display all properties instead of slicing
+- Made left side fixed and centered
+- Removed calendar and large layout elements from listings
+- Simplified property display to show main image and key details
+- Fixed overlap with navigation bar by adding top padding to the home page
+- Added fallback images for unavailable property images
+- Display up to ten properties for scrolling demo
+
+## 2025-03-31 - Refactor Add Listing Form with React Hook Form
+
+- Refactored the Add Listing form to use `react-hook-form` for improved state management, validation, and error handling.
+- Replaced multiple `useState` calls in `useAddListingForm` with the `useForm` hook.
+- Integrated `zod` for schema validation.
+- Updated `AddListingDialog` to use `register`, `Controller`, and `errors` from `react-hook-form`.
+- Affected files: `src/hooks/useAddListingForm.tsx`, `src/components/AddListingDialog.tsx`

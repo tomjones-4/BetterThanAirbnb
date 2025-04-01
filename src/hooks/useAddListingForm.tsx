@@ -1,26 +1,47 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const schema = z.object({
+  address: z.string().min(1, { message: "Address is required" }),
+  price: z.string().min(1, { message: "Price is required" }),
+  fromDate: z.date({ required_error: "From Date is required" }),
+  toDate: z.date({ required_error: "To Date is required" }),
+  amenities: z.string().array(),
+  photos: z.any(), // File array
+});
+
+type FormData = z.infer<typeof schema>;
 
 const useAddListingForm = () => {
-  const [address, setAddress] = useState("");
-  const [price, setPrice] = useState("");
-  const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
-  const [toDate, setToDate] = useState<Date | undefined>(undefined);
-  const [amenities, setAmenities] = useState<string[]>([]);
-  const [photos, setPhotos] = useState<File[]>([]);
-
-  const [addressError, setAddressError] = useState<string | null>(null);
-  const [priceError, setPriceError] = useState<string | null>(null);
-  const [fromDateError, setFromDateError] = useState<string | null>(null);
-  const [toDateError, setToDateError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      address: "",
+      price: "",
+      fromDate: undefined,
+      toDate: undefined,
+      amenities: [],
+      photos: [],
+    },
+  });
 
   const handleAmenityChange = (amenity: string) => {
-    if (amenities.includes(amenity)) {
-      setAmenities(amenities.filter((a) => a !== amenity));
-    } else {
-      setAmenities([...amenities, amenity]);
-    }
+    setValue(
+      "amenities",
+      control._formValues.amenities?.includes(amenity)
+        ? control._formValues.amenities?.filter((a: string) => a !== amenity)
+        : [...(control._formValues.amenities || []), amenity]
+    );
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,47 +56,11 @@ const useAddListingForm = () => {
         }
         return true;
       });
-      setPhotos(validFiles);
+      setValue("photos", validFiles);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    let isValid = true;
-
-    if (!address) {
-      setAddressError("Address is required");
-      isValid = false;
-    } else {
-      setAddressError(null);
-    }
-
-    if (!price) {
-      setPriceError("Price is required");
-      isValid = false;
-    } else {
-      setPriceError(null);
-    }
-
-    if (!fromDate) {
-      setFromDateError("From Date is required");
-      isValid = false;
-    } else {
-      setFromDateError(null);
-    }
-
-    if (!toDate) {
-      setToDateError("To Date is required");
-      isValid = false;
-    } else {
-      setToDateError(null);
-    }
-
-    if (!isValid) {
-      return;
-    }
-
+  const onSubmit = async (data: FormData) => {
     setLoading(true);
 
     try {
@@ -85,7 +70,8 @@ const useAddListingForm = () => {
         for (const photo of photos) {
           const { data, error } = await supabase.storage
             .from("listings")
-            .upload(`${address}/${photo.name}`, photo, {
+            .upload(`${data.address}/${photo.name}`, photo, {
+              // data is form data, not supabase data
               cacheControl: "3600",
               upsert: false,
             });
@@ -106,21 +92,21 @@ const useAddListingForm = () => {
       };
 
       // Upload photos
-      const photoUrls = await uploadPhotos(photos);
+      const photoUrls = await uploadPhotos(data.photos);
       let photo_urls = [];
       if (photoUrls) {
         photo_urls = photoUrls;
       }
 
-      const { data, error } = await supabase
+      const { data: listingData, error } = await supabase
         .from("listings")
         .insert([
           {
-            address,
-            price: parseInt(price),
-            from_date: fromDate.toISOString(),
-            to_date: toDate.toISOString(),
-            amenities,
+            address: data.address,
+            price: parseInt(data.price),
+            from_date: data.fromDate.toISOString(),
+            to_date: data.toDate.toISOString(),
+            amenities: data.amenities,
             photo_urls: photo_urls,
           },
         ])
@@ -131,9 +117,9 @@ const useAddListingForm = () => {
         // TODO: Display user-friendly error message
         alert("Failed to create listing. Please try again.");
       } else {
-        console.log("Listing created:", data);
+        console.log("Listing created:", listingData);
         // Redirect to listing page
-        window.location.href = `/listings/${address}`;
+        window.location.href = `/listings/${data.address}`;
       }
     } catch (error) {
       console.error("Error:", error);
@@ -144,30 +130,15 @@ const useAddListingForm = () => {
   };
 
   return {
-    address,
-    setAddress,
-    price,
-    setPrice,
-    fromDate,
-    setFromDate,
-    toDate,
-    setToDate,
-    amenities,
-    setAmenities,
-    photos,
-    setPhotos,
-    addressError,
-    setAddressError,
-    priceError,
-    setPriceError,
-    fromDateError,
-    setFromDateError,
-    toDateError,
-    setToDateError,
-    loading,
+    register,
+    handleSubmit: handleSubmit(onSubmit),
+    control,
+    setValue,
+    errors,
+    isSubmitting,
     handleAmenityChange,
     handlePhotoChange,
-    handleSubmit,
+    loading,
   };
 };
 
