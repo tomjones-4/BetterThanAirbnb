@@ -1,3 +1,5 @@
+# Changelog
+
 ## 2025-03-31
 
 - Updated the Add Listing form to include all fields from the database schema.

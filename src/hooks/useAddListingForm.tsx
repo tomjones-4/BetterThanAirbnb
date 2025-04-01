@@ -5,11 +5,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 const schema = z.object({
+  name: z.string().min(1, { message: "Name is required" }),
+  description: z.string().optional(),
   address: z.string().min(1, { message: "Address is required" }),
   price: z.string().min(1, { message: "Price is required" }),
-  fromDate: z.date({ required_error: "From Date is required" }),
-  toDate: z.date({ required_error: "To Date is required" }),
-  amenities: z.string().array(),
+  amenities: z.string().array().optional(),
+  property_type: z.string().optional(),
+  bedrooms: z.number().min(1).optional(),
+  bathrooms: z.number().min(1).optional(),
+  max_guests: z.number().min(1).optional(),
+  start_date: z.date({ required_error: "Start Date is required" }),
+  end_date: z.date({ required_error: "End Date is required" }),
   photos: z.any(), // File array
 });
 
@@ -26,11 +32,17 @@ const useAddListingForm = () => {
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
+      name: "",
+      description: "",
       address: "",
       price: "",
-      fromDate: undefined,
-      toDate: undefined,
       amenities: [],
+      property_type: "",
+      bedrooms: 1,
+      bathrooms: 1,
+      max_guests: 1,
+      start_date: undefined,
+      end_date: undefined,
       photos: [],
     },
   });
@@ -85,11 +97,17 @@ const useAddListingForm = () => {
         .from("listings")
         .insert([
           {
+            name: data.name,
+            description: data.description,
             address: data.address,
             price: parseInt(data.price),
-            start_date: data.fromDate.toISOString(),
-            end_date: data.toDate.toISOString(),
             amenities: data.amenities,
+            property_type: data.property_type,
+            bedrooms: data.bedrooms,
+            bathrooms: data.bathrooms,
+            max_guests: data.max_guests,
+            start_date: data.start_date.toISOString(),
+            end_date: data.end_date.toISOString(),
           },
         ])
         .select();

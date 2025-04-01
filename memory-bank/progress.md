@@ -8,6 +8,9 @@ _This file tracks what works, what's left to build, the current status, and know
 - Google OAuth authentication via the navigation bar.
 - Add Listing feature (accessible via modal after login).
 - Add Listing form state management and validation refactored using React Hook Form and Zod.
+- Add Listing form updated to include all fields from the database schema.
+- Listing route updated to display a summary of the listing data in a Card component.
+- Improved styling and scrollability of the Add Listing form.
 
 ## What's Left to Build
 
@@ -26,3 +29,5 @@ _(Document any bugs, limitations, or areas of concern that need to be addressed.
 - **Authentication:** Moved from separate sign-in/sign-up routes/modal to integrated Google OAuth in the navigation bar (2025-02-23).
 - **Add Listing Access:** Initially open, now requires user login via Google OAuth (2025-03-29).
 - **Add Listing Form Management:** Refactored from individual `useState` hooks to using `react-hook-form` with `zod` for better maintainability, validation, and performance (2025-03-31).
+- **Add Listing Form Update:** Updated the Add Listing form to include all fields from the database schema and updated the listing route to display a summary of the listing data (2025-03-31).
+- **Add Listing Form Styling:** Improved styling and scrollability of the Add Listing form (2025-03-31).

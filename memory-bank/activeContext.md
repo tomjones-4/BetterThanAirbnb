@@ -12,6 +12,7 @@ Refactoring the Add Listing form (`useAddListingForm` hook and `AddListingDialog
 - Refactored `useAddListingForm.tsx` to use `useForm` hook, `zod` schema, and associated methods.
 - Refactored `AddListingDialog.tsx` to integrate with the updated hook, using `register`, `Controller`, and displaying errors from `formState`.
 - Updated `changelog.md` and `memory-bank/techContext.md`.
+- Improved styling and scrollability of the Add Listing form by increasing the width of the dialog and adding a scroll area.
 
 ## Next Steps
 
