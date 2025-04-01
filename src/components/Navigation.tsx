@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Home, Search, MessageSquare, Menu, X, User } from "lucide-react";
@@ -84,7 +83,9 @@ export const Navigation = () => {
                       <Messages onClose={() => setIsMessagesOpen(false)} />
                     </DialogContent>
                   </Dialog>
-                  <DropdownMenuItem onSelect={() => window.location.href = "/profile"}>
+                  <DropdownMenuItem
+                    onSelect={() => (window.location.href = "/profile")}
+                  >
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </DropdownMenuItem>
@@ -151,12 +152,6 @@ export const Navigation = () => {
                 </Link>
               </>
             )}
-            <Link
-              to="/changelog"
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <span>Changelog</span>
-            </Link>
           </div>
         </div>
       )}
