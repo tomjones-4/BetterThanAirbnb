@@ -10,18 +10,18 @@ import {
 } from "@/components/ui/card";
 
 const ListingPage = () => {
-  const { listingId } = useParams();
+  const { id } = useParams();
   const [listing, setListing] = useState(null);
   const [images, setImages] = useState<{ image_url: string }[]>([]);
 
   useEffect(() => {
     const fetchListingData = async () => {
-      if (!listingId) return;
+      if (!id) return;
 
       const { data, error } = await supabase
         .from("listings")
         .select("*")
-        .eq("id", listingId)
+        .eq("id", id)
         .single();
 
       if (error) {
@@ -37,7 +37,7 @@ const ListingPage = () => {
       const { data: imageData, error: imageError } = await supabase
         .from("images")
         .select("image_url")
-        .eq("listing_id", listingId);
+        .eq("listing_id", id);
 
       if (imageData && !imageError) {
         setImages(imageData);
@@ -45,7 +45,7 @@ const ListingPage = () => {
     };
 
     fetchListingData();
-  }, [listingId]);
+  }, [id]);
 
   if (!listing) {
     return <div>Loading...</div>;

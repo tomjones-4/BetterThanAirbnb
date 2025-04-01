@@ -7,7 +7,7 @@ import { Navigation } from "./components/Navigation";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
-import { PropertyDetails } from "./pages/PropertyDetails";
+import ListingPage from "./pages/listings/[listingId]";
 import ChangelogPage from "./pages/Changelog";
 import ProfilePage from "./pages/Profile";
 
@@ -23,7 +23,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/properties/:id" element={<PropertyDetails />} />
+          <Route path="/listings/:id" element={<ListingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
