@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
@@ -46,8 +47,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             <PropertyCard
               key={property.id}
               property={property}
-              onMouseEnter={() => setSelectedProperty(property)}
-              onMouseLeave={() => setSelectedProperty(null)}
+              // Remove the onMouseEnter and onMouseLeave props that don't exist on PropertyCard
             />
           ))}
         </div>
