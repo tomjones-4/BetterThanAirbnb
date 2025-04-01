@@ -103,8 +103,9 @@ export const Navigation = () => {
             <AddListingDialog />
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          {/* Mobile Navigation Controls */}
+          <div className="md:hidden flex items-center space-x-2">
+            <AddListingDialog />
             <Button variant="ghost" size="icon" onClick={toggleMenu}>
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </Button>
@@ -112,7 +113,7 @@ export const Navigation = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
+      {/* Mobile Navigation Dropdown */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-200 animate-fade-down">
           <div className="container mx-auto px-4 py-4 space-y-4">

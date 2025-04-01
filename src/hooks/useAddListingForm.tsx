@@ -55,13 +55,10 @@ const useAddListingForm = () => {
     setLoading(true);
 
     try {
-      // TODO: Move uploadPhotos to a separate hook
       const uploadPhotos = async (photos: File[]) => {
         const photoUrls: string[] = [];
-        // Use the 'data' from the outer scope (form data) for the path
         const formData = data;
         for (const photo of photos) {
-          // Rename the destructured 'data' from Supabase response to 'uploadData'
           const { data: uploadData, error } = await supabase.storage
             .from("listings")
             .upload(`${formData.address}/${photo.name}`, photo, {
@@ -71,12 +68,10 @@ const useAddListingForm = () => {
 
           if (error) {
             console.error("Error uploading photo:", error);
-            // TODO: Display user-friendly error message
             alert("Failed to upload photo. Please try again.");
             return null;
           } else {
             console.log("Photo uploaded:", uploadData);
-            // Use uploadData.path to construct the URL
             const url = `https://betterthanairbnb.supabase.co/storage/v1/object/public/${uploadData.path}`;
             photoUrls.push(url);
           }
@@ -84,12 +79,7 @@ const useAddListingForm = () => {
         return photoUrls;
       };
 
-      // Upload photos
       const photoUrls = await uploadPhotos(data.photos);
-      let photo_urls = [];
-      if (photoUrls) {
-        photo_urls = photoUrls;
-      }
 
       const { data: listingData, error } = await supabase
         .from("listings")
@@ -100,19 +90,37 @@ const useAddListingForm = () => {
             start_date: data.fromDate.toISOString(),
             end_date: data.toDate.toISOString(),
             amenities: data.amenities,
-            photo_urls: photo_urls,
           },
         ])
         .select();
 
       if (error) {
         console.error("Supabase error:", error);
-        // TODO: Display user-friendly error message
         alert("Failed to create listing. Please try again.");
-      } else {
-        console.log("Listing created:", listingData);
-        // Redirect to listing page
-        window.location.href = `/listings/${data.address}`;
+        return;
+      }
+
+      if (photoUrls && photoUrls.length > 0 && listingData && listingData[0]) {
+        const listingId = listingData[0].id;
+
+        const imageInserts = photoUrls.map((url) => ({
+          listing_id: listingId,
+          image_url: url,
+        }));
+
+        const { error: imageError } = await supabase
+          .from("images")
+          .insert(imageInserts);
+
+        if (imageError) {
+          console.error("Error adding images:", imageError);
+          alert("Listing created but there was an issue adding images.");
+        }
+      }
+
+      console.log("Listing created:", listingData);
+      if (listingData && listingData[0]) {
+        window.location.href = `/listings/${listingData[0].id}`;
       }
     } catch (error) {
       console.error("Error:", error);
@@ -129,7 +137,6 @@ const useAddListingForm = () => {
     setValue,
     errors,
     isSubmitting,
-    // handleAmenityChange, // Removed
     handlePhotoChange,
     loading,
   };
