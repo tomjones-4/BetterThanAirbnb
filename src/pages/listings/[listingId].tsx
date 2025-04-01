@@ -5,9 +5,10 @@ import { supabase } from "@/lib/supabase";
 const ListingPage = () => {
   const { listingId } = useParams();
   const [listing, setListing] = useState(null);
+  const [images, setImages] = useState<{ image_url: string }[]>([]);
 
   useEffect(() => {
-    const fetchListing = async () => {
+    const fetchListingData = async () => {
       const { data, error } = await supabase
         .from("listings")
         .select("*")
@@ -22,9 +23,19 @@ const ListingPage = () => {
         console.log("Listing data:", data);
         setListing(data);
       }
+
+      // Fetch images for this listing
+      const { data: imageData, error: imageError } = await supabase
+        .from("images")
+        .select("image_url")
+        .eq("listing_id", listingId);
+
+      if (imageData && !imageError) {
+        setImages(imageData);
+      }
     };
 
-    fetchListing();
+    fetchListingData();
   }, [listingId]);
 
   if (!listing) {
@@ -39,8 +50,8 @@ const ListingPage = () => {
       <p>From Date: {listing.start_date}</p>
       <p>To Date: {listing.end_date}</p>
       <p>Amenities: {listing.amenities.join(", ")}</p>
-      {listing.photo_urls.map((url, index) => (
-        <img key={index} src={url} alt={`Listing Photo ${index + 1}`} />
+      {images.map((image, index) => (
+        <img key={index} src={image.image_url} alt={`Property ${index + 1}`} />
       ))}
     </div>
   );
