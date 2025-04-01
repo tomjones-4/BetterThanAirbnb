@@ -38,6 +38,30 @@ import {
 import useAddListingForm from "@/hooks/useAddListingForm";
 import { Controller } from "react-hook-form";
 
+// Define amenities list with corresponding icons
+const amenitiesList = [
+  { id: "wifi", label: "Wi-Fi", value: "Wi-Fi", Icon: Wifi },
+  { id: "pool", label: "Pool", value: "Pool", Icon: GlassWater },
+  { id: "parking", label: "Parking", value: "Parking", Icon: ParkingSquare },
+  { id: "kitchen", label: "Kitchen", value: "Kitchen", Icon: Utensils },
+  { id: "laundry", label: "Laundry", value: "Laundry", Icon: Shirt },
+  { id: "gym", label: "Gym", value: "Gym", Icon: Dumbbell },
+  {
+    id: "petFriendly",
+    label: "Pet Friendly",
+    value: "Pet Friendly",
+    Icon: PawPrint,
+  },
+  {
+    id: "airConditioning",
+    label: "Air Conditioning",
+    value: "Air Conditioning",
+    Icon: Wind,
+  },
+  { id: "heating", label: "Heating", value: "Heating", Icon: Flame },
+  { id: "tv", label: "TV", value: "TV", Icon: Tv },
+];
+
 const AddListingDialog = () => {
   const [open, setOpen] = useState(false);
   const { session, handleSignIn } = useAuth();
@@ -48,7 +72,7 @@ const AddListingDialog = () => {
     setValue,
     errors,
     isSubmitting,
-    handleAmenityChange,
+    // handleAmenityChange, // No longer needed here
     handlePhotoChange,
     loading,
   } = useAddListingForm();
@@ -181,127 +205,50 @@ const AddListingDialog = () => {
           </div>
           <div className="grid gap-2">
             <Label>Amenities</Label>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="wifi"
-                  checked={control._formValues.amenities?.includes("Wi-Fi")}
-                  onCheckedChange={() => handleAmenityChange("Wi-Fi")}
-                />
-                <Label htmlFor="wifi" className="flex items-center ml-1">
-                  <Wifi className="mr-1 h-4 w-4" />
-                  Wi-Fi
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="pool"
-                  checked={control._formValues.amenities?.includes("Pool")}
-                  onCheckedChange={() => handleAmenityChange("Pool")}
-                />
-                <Label htmlFor="pool" className="flex items-center ml-1">
-                  <GlassWater className="mr-1 h-4 w-4" />
-                  Pool
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="parking"
-                  checked={control._formValues.amenities?.includes("Parking")}
-                  onCheckedChange={() => handleAmenityChange("Parking")}
-                />
-                <Label htmlFor="parking" className="flex items-center ml-1">
-                  <ParkingSquare className="mr-1 h-4 w-4" />
-                  Parking
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="kitchen"
-                  checked={control._formValues.amenities?.includes("Kitchen")}
-                  onCheckedChange={() => handleAmenityChange("Kitchen")}
-                />
-                <Label htmlFor="kitchen" className="flex items-center ml-1">
-                  <Utensils className="mr-1 h-4 w-4" />
-                  Kitchen
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="laundry"
-                  checked={control._formValues.amenities?.includes("Laundry")}
-                  onCheckedChange={() => handleAmenityChange("Laundry")}
-                />
-                <Label htmlFor="laundry" className="flex items-center ml-1">
-                  <Shirt className="mr-1 h-4 w-4" />
-                  Laundry
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="gym"
-                  checked={control._formValues.amenities?.includes("Gym")}
-                  onCheckedChange={() => handleAmenityChange("Gym")}
-                />
-                <Label htmlFor="gym" className="flex items-center ml-1">
-                  <Dumbbell className="mr-1 h-4 w-4" />
-                  Gym
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="petFriendly"
-                  checked={control._formValues.amenities?.includes(
-                    "Pet Friendly"
-                  )}
-                  onCheckedChange={() => handleAmenityChange("Pet Friendly")}
-                />
-                <Label htmlFor="petFriendly" className="flex items-center ml-1">
-                  <PawPrint className="mr-1 h-4 w-4" />
-                  Pet Friendly
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="airConditioning"
-                  checked={control._formValues.amenities?.includes(
-                    "Air Conditioning"
-                  )}
-                  onCheckedChange={() =>
-                    handleAmenityChange("Air Conditioning")
-                  }
-                />
-                <Label
-                  htmlFor="airConditioning"
-                  className="flex items-center ml-1"
-                >
-                  <Wind className="mr-1 h-4 w-4" />
-                  Air Conditioning
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="heating"
-                  checked={control._formValues.amenities?.includes("Heating")}
-                  onCheckedChange={() => handleAmenityChange("Heating")}
-                />
-                <Label htmlFor="heating" className="flex items-center ml-1">
-                  <Flame className="mr-1 h-4 w-4" />
-                  Heating
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="tv"
-                  checked={control._formValues.amenities?.includes("TV")}
-                  onCheckedChange={() => handleAmenityChange("TV")}
-                />
-                <Label htmlFor="tv" className="flex items-center ml-1">
-                  <Tv className="mr-1 h-4 w-4" />
-                  TV
-                </Label>
-              </div>
-            </div>
+            <Controller
+              name="amenities"
+              control={control}
+              render={({ field }) => (
+                <div className="grid grid-cols-2 gap-2">
+                  {amenitiesList.map((amenity) => (
+                    <div
+                      key={amenity.id}
+                      className="flex items-center space-x-2"
+                    >
+                      <Checkbox
+                        id={amenity.id}
+                        checked={field.value?.includes(amenity.value)}
+                        onCheckedChange={(checked) => {
+                          const currentAmenities = field.value || [];
+                          if (checked) {
+                            field.onChange([
+                              ...currentAmenities,
+                              amenity.value,
+                            ]);
+                          } else {
+                            field.onChange(
+                              currentAmenities.filter(
+                                (value) => value !== amenity.value
+                              )
+                            );
+                          }
+                        }}
+                      />
+                      <Label
+                        htmlFor={amenity.id}
+                        className="flex items-center ml-1"
+                      >
+                        <amenity.Icon className="mr-1 h-4 w-4" />
+                        {amenity.label}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            />
+            {errors.amenities && (
+              <p className="text-red-500">{errors.amenities.message}</p>
+            )}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="photos">Photos</Label>

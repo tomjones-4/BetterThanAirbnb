@@ -35,15 +35,6 @@ const useAddListingForm = () => {
     },
   });
 
-  const handleAmenityChange = (amenity: string) => {
-    setValue(
-      "amenities",
-      control._formValues.amenities?.includes(amenity)
-        ? control._formValues.amenities?.filter((a: string) => a !== amenity)
-        : [...(control._formValues.amenities || []), amenity]
-    );
-  };
-
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -67,11 +58,13 @@ const useAddListingForm = () => {
       // TODO: Move uploadPhotos to a separate hook
       const uploadPhotos = async (photos: File[]) => {
         const photoUrls: string[] = [];
+        // Use the 'data' from the outer scope (form data) for the path
+        const formData = data;
         for (const photo of photos) {
-          const { data, error } = await supabase.storage
+          // Rename the destructured 'data' from Supabase response to 'uploadData'
+          const { data: uploadData, error } = await supabase.storage
             .from("listings")
-            .upload(`${data.address}/${photo.name}`, photo, {
-              // data is form data, not supabase data
+            .upload(`${formData.address}/${photo.name}`, photo, {
               cacheControl: "3600",
               upsert: false,
             });
@@ -82,9 +75,9 @@ const useAddListingForm = () => {
             alert("Failed to upload photo. Please try again.");
             return null;
           } else {
-            console.log("Photo uploaded:", data);
-            // TODO: Get the correct URL from the data object
-            const url = `https://betterthanairbnb.supabase.co/storage/v1/object/public/${data.path}`;
+            console.log("Photo uploaded:", uploadData);
+            // Use uploadData.path to construct the URL
+            const url = `https://betterthanairbnb.supabase.co/storage/v1/object/public/${uploadData.path}`;
             photoUrls.push(url);
           }
         }
@@ -136,7 +129,7 @@ const useAddListingForm = () => {
     setValue,
     errors,
     isSubmitting,
-    handleAmenityChange,
+    // handleAmenityChange, // Removed
     handlePhotoChange,
     loading,
   };
