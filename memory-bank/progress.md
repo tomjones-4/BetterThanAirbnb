@@ -9,8 +9,11 @@ _This file tracks what works, what's left to build, the current status, and know
 - Add Listing feature (accessible via modal after login).
 - Add Listing form state management and validation refactored using React Hook Form and Zod.
 - Add Listing form updated to include all fields from the database schema.
-- Listing route updated to display a summary of the listing data in a Card component.
+- Listing page (`/listings/:id`) route fixed and UI significantly refactored for better presentation:
+  - Uses grid layout, image carousel, icons, badges, skeletons, and improved error/loading states.
 - Improved styling and scrollability of the Add Listing form.
+- Improved the listing details page by adjusting spacing, conditionally rendering details, adding a placeholder image, and using the same amenity icons as the Add Listing form.
+- Implemented the changes to the listing details page.
 
 ## What's Left to Build
 

@@ -17,6 +17,8 @@ Refactoring the Add Listing form (`useAddListingForm` hook and `AddListingDialog
 ## Next Steps
 
 - Update `memory-bank/progress.md`.
+- The listing details page has been updated to adjust spacing, conditionally render details, add a placeholder image, and use the same amenity icons as the Add Listing form.
+- Implemented the changes to the listing details page.
 - Complete the task by presenting the result.
 
 ## Active Decisions & Considerations
