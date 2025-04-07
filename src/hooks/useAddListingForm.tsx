@@ -10,7 +10,7 @@ const schema = z.object({
   address: z.string().min(1, { message: "Address is required" }),
   price: z.string().min(1, { message: "Price is required" }),
   amenities: z.string().array().optional(),
-  property_type: z.string().optional(),
+  property_type: z.enum(["house", "condo"]).optional(),
   bedrooms: z.number().min(1).optional(),
   bathrooms: z.number().min(1).optional(),
   max_guests: z.number().min(1).optional(),
@@ -29,6 +29,7 @@ const useAddListingForm = () => {
     control,
     setValue,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -37,7 +38,7 @@ const useAddListingForm = () => {
       address: "",
       price: "",
       amenities: [],
-      property_type: "",
+      property_type: "house",
       bedrooms: 1,
       bathrooms: 1,
       max_guests: 1,
@@ -157,6 +158,7 @@ const useAddListingForm = () => {
     isSubmitting,
     handlePhotoChange,
     loading,
+    reset,
   };
 };
 

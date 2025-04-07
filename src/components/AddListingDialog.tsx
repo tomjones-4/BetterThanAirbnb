@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
@@ -24,6 +24,8 @@ import { CalendarIcon } from "@radix-ui/react-icons";
 import { supabase } from "@/lib/supabase";
 import Spinner from "@/components/ui/spinner";
 import {
+  HomeIcon,
+  Building,
   Wifi,
   GlassWater,
   ParkingSquare,
@@ -76,7 +78,21 @@ const AddListingDialog = () => {
     isSubmitting,
     handlePhotoChange,
     loading,
+    reset,
   } = useAddListingForm();
+  const [propertyType, setPropertyType] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      reset();
+      setPropertyType(null);
+    }
+  }, [open, reset]);
+
+  const handlePropertyTypeSelect = (type: string) => {
+    setPropertyType(type);
+    setValue("property_type", type);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -94,14 +110,14 @@ const AddListingDialog = () => {
           Add Listing
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] p-4 sm:p-6 w-[100vw] sm:w-auto max-w-full sm:max-w-[600px] h-full sm:h-auto max-h-[100vh] sm:max-h-[90vh]">
+      <DialogContent className="p-4 sm:p-6 w-[100vw] sm:w-auto max-w-full sm:max-w-[600px] h-[90vh] sm:h-auto overflow-hidden">
         <DialogHeader>
           <DialogTitle>Add a New Listing</DialogTitle>
           <DialogDescription>
             Fill in the details below to create a new property listing.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="h-[calc(100vh-150px)] sm:h-[600px] w-full">
+        <ScrollArea className="h-[calc(90vh-150px)] sm:h-[500px] w-full pr-4">
           <div className="px-2 sm:px-4">
             <form onSubmit={handleSubmit} className="grid gap-4 py-2 sm:py-4">
               <div className="grid gap-2">
@@ -143,12 +159,37 @@ const AddListingDialog = () => {
                 )}
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="property_type">Property Type</Label>
-                <Input
-                  type="text"
-                  id="property_type"
-                  {...register("property_type")}
-                />
+                <Label>Property Type</Label>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    type="button"
+                    variant={propertyType === "house" ? "default" : "outline"}
+                    size="sm"
+                    className={cn(
+                      "w-[100px] justify-center transition-all",
+                      propertyType === "house" &&
+                        "ring-2 ring-primary ring-offset-2"
+                    )}
+                    onClick={() => handlePropertyTypeSelect("house")}
+                  >
+                    <HomeIcon className="mr-2 h-4 w-4" />
+                    House
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={propertyType === "condo" ? "default" : "outline"}
+                    size="sm"
+                    className={cn(
+                      "w-[100px] justify-center transition-all",
+                      propertyType === "condo" &&
+                        "ring-2 ring-primary ring-offset-2"
+                    )}
+                    onClick={() => handlePropertyTypeSelect("condo")}
+                  >
+                    <Building className="mr-2 h-4 w-4" />
+                    Condo
+                  </Button>
+                </div>
                 {errors.property_type && (
                   <p className="text-red-500">
                     {errors.property_type?.message}

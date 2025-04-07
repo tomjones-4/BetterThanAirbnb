@@ -1,5 +1,14 @@
 # Changelog
 
+## 2025-04-06 - Add Property Type Toggle to Add Listing Form
+
+- Updated the Add Listing form to include a toggle for property type (house/condo).
+- Used `lucide-react` icons for house and condo.
+- Modified `src/components/AddListingDialog.tsx` to replace the text input with a toggle component.
+- Modified `src/hooks/useAddListingForm.tsx` to validate that `property_type` is either "house" or "condo".
+- Set the default value of `property_type` to "house".
+- Affected files: `src/components/AddListingDialog.tsx`, `src/hooks/useAddListingForm.tsx`
+
 ## 2025-03-31 - Improve Listing Details Page UI and Spacing
 
 - Fixed heading alignment on the listing details page by modifying the `listing-heading` class in `src/App.css`.
