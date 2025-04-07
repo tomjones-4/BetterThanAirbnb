@@ -1,10 +1,27 @@
+import { Link } from "react-router-dom";
 import { mockProperties } from "@/data/mockData";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { PropertyCard } from "@/components/PropertyCard";
 import { SearchBar } from "@/components/SearchBar";
+import { Property } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
+import { useListings } from "@/hooks/useListings"; // Import the new hook
 
 const Index = () => {
+  // Use the custom hook to fetch listings
+  const { dbListings, loading, error } = useListings();
+
+  // Combine DB listings and mock listings, prioritizing DB listings
+  // Filter mocks to avoid duplicates if IDs overlap (unlikely but safe)
+  // Ensure mockProperties also conform to the Property type structure if needed
+  const dbListingIds = new Set(dbListings.map((listing) => listing.id));
+  const combinedProperties: Property[] = [
+    // Explicitly type the combined array
+    ...dbListings,
+    ...mockProperties.filter((mock) => !dbListingIds.has(mock.id)), // Assuming mockProperties are compatible with Property type
+  ];
+
   return (
     <div className="min-h-screen bg-white flex flex-col md:pt-20">
       {/* Search section - full width on mobile, left half on desktop */}
@@ -27,15 +44,37 @@ const Index = () => {
         <h2 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 z-10">
           Available Properties
         </h2>
-        <div className="space-y-4 md:space-y-6">
-          {mockProperties.slice(0, 10).map((property) => (
-            <PropertyCard
-              key={property.id}
-              property={property}
-              compact={true}
-            />
-          ))}
-        </div>
+        {loading && (
+          <div className="space-y-4 md:space-y-6">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-[120px] w-full rounded-lg" />
+            ))}
+          </div>
+        )}
+        {error && (
+          <Alert variant="destructive">
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {!loading && !error && (
+          <div className="space-y-4 md:space-y-6">
+            {combinedProperties.length > 0 ? (
+              combinedProperties.map((property) => (
+                <Link
+                  key={property.id}
+                  to={`/listings/${property.id}`}
+                  className="block hover:bg-gray-50 rounded-lg transition-colors duration-150" // Added hover effect and link styling
+                >
+                  <PropertyCard property={property} compact={true} />
+                </Link>
+              ))
+            ) : (
+              <p className="text-gray-500">No properties found.</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

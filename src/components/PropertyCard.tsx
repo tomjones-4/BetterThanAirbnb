@@ -12,21 +12,21 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   property,
   compact = false,
 }) => {
-  const { title, price, location, images } = property;
+  const { title, name, price, location, images } = property;
   const imageUrl = images?.[0] || "https://via.placeholder.com/300";
 
   if (compact) {
     return (
       <Card className="mb-6 flex overflow-hidden shadow-sm">
         <img
-          src={imageUrl}
-          alt={title}
+          src={imageUrl ||}
+          alt={title || name}
           className="w-1/3 h-[150px] object-cover"
         />
         <div className="w-2/3 p-4">
           <h3 className="font-semibold text-xl">{title}</h3>
           <p className="text-sm text-gray-500">
-            {location.city}, {location.state}
+            {location?.city}, {location?.state}
           </p>
           <p className="mt-2 text-sm font-medium">${price}/night</p>
           <Button variant="outline" className="mt-4 text-sm" size="sm">

@@ -4,7 +4,15 @@ _This file tracks what works, what's left to build, the current status, and know
 
 ## What Works
 
-- Basic property listing display on the homepage.
+- Index page (`src/pages/Index.tsx`):
+  - Uses the `useListings` hook to fetch listings from Supabase database.
+  - Combines database listings with mock data (DB prioritized).
+  - Displays listings using `PropertyCard`.
+  - Implements loading and error states via the `useListings` hook.
+  - Makes each property card a clickable link to its detail page (`/listings/:id`).
+- Custom hook `useListings` (`src/hooks/useListings.tsx`):
+  - Encapsulates Supabase listing fetch logic, state management (listings, loading, error), and `useEffect`.
+- Added `created_at` column to the `listings` table.
 - Google OAuth authentication via the navigation bar.
 - Add Listing feature (accessible via modal after login).
 - Add Listing form state management and validation refactored using React Hook Form and Zod.
