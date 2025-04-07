@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025-04-06 - Update PropertyCard to use a random image URL
+
+- Updated the `PropertyCard` component to use `https://picsum.photos/200` as the backup image when no images are available.
+- Affected files: `src/components/PropertyCard.tsx`
+
 ## 2025-04-06 - Add 'created_at' Column to Listings Table
 
 - Created a Supabase migration to add the `created_at` column to the `listings` table.

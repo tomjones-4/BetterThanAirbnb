@@ -1,16 +1,16 @@
-
 export interface User {
   id: string;
   name: string;
   email: string;
   avatar: string;
-  role: 'host' | 'renter';
+  role: "host" | "renter";
   joined: string;
 }
 
 export interface Property {
   id: string;
-  title: string;
+  title?: string;
+  name?: string;
   description: string;
   price: number;
   location: {
@@ -47,7 +47,7 @@ export interface Booking {
   checkIn: string;
   checkOut: string;
   totalPrice: number;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: "pending" | "confirmed" | "cancelled";
   createdAt: string;
 }
 

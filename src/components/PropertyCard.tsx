@@ -13,21 +13,27 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   compact = false,
 }) => {
   const { title, name, price, location, images } = property;
-  const imageUrl = images?.[0] || "https://via.placeholder.com/300";
+  const imageUrl =
+    images?.[0] ||
+    "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2";
 
   if (compact) {
     return (
       <Card className="mb-6 flex overflow-hidden shadow-sm">
         <img
-          src={imageUrl ||}
-          alt={title || name}
+          src={imageUrl}
+          alt={title || name || "Property"}
           className="w-1/3 h-[150px] object-cover"
         />
         <div className="w-2/3 p-4">
-          <h3 className="font-semibold text-xl">{title}</h3>
-          <p className="text-sm text-gray-500">
-            {location?.city}, {location?.state}
-          </p>
+          <h3 className="font-semibold text-xl">
+            {title || name || "Property"}
+          </h3>
+          {location?.city && location?.state && (
+            <p className="text-sm text-gray-500">
+              {location.city}, {location.state}
+            </p>
+          )}
           <p className="mt-2 text-sm font-medium">${price}/night</p>
           <Button variant="outline" className="mt-4 text-sm" size="sm">
             Book Now
