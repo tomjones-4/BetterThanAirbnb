@@ -1,10 +1,14 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "http://localhost:54321";
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  "http://127.0.0.1:54323/project/default";
+const supabaseKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "your-anon-key";
 
 const supabase = createClientComponentClient({
   supabaseUrl: supabaseUrl,
+  supabaseKey: supabaseKey,
 });
 
 export async function getConversations(userId: string) {
@@ -30,6 +34,25 @@ export async function getConversations(userId: string) {
   }
 }
 
+export async function fetchUsers() {
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/fetch-users`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+}
+
 export async function sendMessage(
   conversationId: string,
   senderId: string,
@@ -50,6 +73,26 @@ export async function sendMessage(
     return data;
   } catch (error) {
     console.error("Error sending message:", error);
+    throw error;
+  }
+}
+
+export async function getMessages(conversationId: string) {
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/get-messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conversationId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching messages:", error);
     throw error;
   }
 }
