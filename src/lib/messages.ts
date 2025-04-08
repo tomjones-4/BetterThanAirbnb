@@ -34,6 +34,35 @@ export async function getConversations(userId: string) {
   }
 }
 
+export async function createConversation(
+  recipientId: string,
+  initialMessage: string
+) {
+  try {
+    const response = await fetch(
+      `${supabaseUrl}/functions/v1/create-conversation`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer \${supabase.auth.session()?.access_token}`,
+        },
+        body: JSON.stringify({ recipientId, initialMessage }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error creating conversation:", error);
+    throw error;
+  }
+}
+
 export async function fetchUsers() {
   try {
     const response = await fetch(`${supabaseUrl}/functions/v1/fetch-users`, {

@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { getConversations, sendMessage, getMessages } from "@/lib/messages";
+import {
+  getConversations,
+  sendMessage,
+  getMessages,
+  fetchUsers,
+  createConversation,
+} from "@/lib/messages";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,23 +29,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchUsers } from "@/lib/messages";
+import { useToast } from "@/hooks/use-toast";
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
 
 const Messages = () => {
-  const [conversations, setConversations] = useState([]);
-  const [selectedConversationId, setSelectedConversationId] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [selectedConversationId, setSelectedConversationId] = useState<
+    string | null
+  >(null);
+  const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [open, setOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] = useState("");
+  const [initialMessage, setInitialMessage] = useState("");
   const { session } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
       if (session?.user?.id) {
-        await fetchConversations(session.user.id);
-        await fetchUsersData();
+        try {
+          await fetchConversations(session.user.id);
+          const usersData = await fetchUsers();
+          setUsers(usersData?.users || []);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       }
     };
     fetchData();
@@ -129,7 +150,12 @@ const Messages = () => {
                 <Label htmlFor="message" className="text-right">
                   Message
                 </Label>
-                <Textarea id="message" className="col-span-3" />
+                <Textarea
+                  id="message"
+                  className="col-span-3"
+                  value={initialMessage}
+                  onChange={(e) => setInitialMessage(e.target.value)}
+                />
               </div>
             </div>
             <DialogFooter>
