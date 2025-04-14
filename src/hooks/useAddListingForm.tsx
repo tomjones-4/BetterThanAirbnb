@@ -4,6 +4,9 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+// Import the useAuth hook to get the current user session
+import { useAuth } from "./useAuth";
+
 const schema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   description: z.string().optional(),
@@ -23,6 +26,9 @@ type FormData = z.infer<typeof schema>;
 
 const useAddListingForm = () => {
   const [loading, setLoading] = useState(false);
+  // Get the current user session from useAuth
+  const { session } = useAuth();
+
   const {
     register,
     handleSubmit,
@@ -67,6 +73,15 @@ const useAddListingForm = () => {
   const onSubmit = async (data: FormData) => {
     setLoading(true);
 
+    // Check if user is logged in
+    if (!session || !session.user) {
+      alert("You must be logged in to create a listing.");
+      setLoading(false);
+      return;
+    }
+
+    const userId = session.user.id;
+
     try {
       const uploadPhotos = async (photos: File[]) => {
         const photoUrls: string[] = [];
@@ -109,6 +124,7 @@ const useAddListingForm = () => {
             max_guests: data.max_guests,
             start_date: data.start_date.toISOString(),
             end_date: data.end_date.toISOString(),
+            host_id: userId, // Add the host_id (user ID) to the listing
           },
         ])
         .select();
@@ -121,7 +137,6 @@ const useAddListingForm = () => {
 
       if (photoUrls && photoUrls.length > 0 && listingData && listingData[0]) {
         const listingId = listingData[0].id;
-
         const imageInserts = photoUrls.map((url) => ({
           listing_id: listingId,
           image_url: url,

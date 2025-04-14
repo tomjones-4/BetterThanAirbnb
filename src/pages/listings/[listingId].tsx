@@ -174,14 +174,6 @@ const ListingPage = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-8 pt-24 md:pt-32 overflow-x-hidden overflow-y-auto">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-8 rounded-lg shadow-lg mb-8 text-center">
-        {listing.name && (
-          <h1 className="text-4xl font-extrabold mb-2">{listing.name}</h1>
-        )}
-        <p className="text-lg opacity-90">Experience your perfect getaway</p>
-      </div>
-
       <Card className="overflow-hidden shadow-2xl border-0 rounded-xl">
         <CardHeader className="pb-4">
           {/* Conditionally render name */}

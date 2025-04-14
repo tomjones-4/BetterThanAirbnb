@@ -13,16 +13,7 @@ export interface Property {
   name?: string;
   description: string;
   price: number;
-  location: {
-    address: string;
-    city: string;
-    state: string;
-    country: string;
-    coordinates: {
-      lat: number;
-      lng: number;
-    };
-  };
+  address: string;
   images: string[];
   hostId: string; // Added to link property with host
   host: User;
@@ -31,13 +22,12 @@ export interface Property {
   bedrooms: number;
   beds: number;
   baths: number;
-  availability: {
-    startDate: string;
-    endDate: string;
-  }[];
+  startDate: string;
+  endDate: string;
   rules: string[];
   rating: number;
   reviews: number;
+  property_type: "house" | "condo";
 }
 
 export interface Booking {
