@@ -1,176 +1,218 @@
-
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { X, ImagePlus, Check, CheckCheck } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  getConversations,
+  sendMessage,
+  getMessages,
+  fetchUsers,
+  createConversation,
+} from "@/lib/messages";
+import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
-interface Message {
-  id: number;
-  sender: string;
-  text: string;
-  unread: boolean;
-  timestamp: string;
-  image?: string;
-  readAt?: string;
+interface User {
+  id: string;
+  name: string;
+  email: string;
 }
 
-interface MessagesProps {
-  onClose?: () => void;
-  hostId?: string;
-  propertyId?: string;
-}
-
-export const Messages = ({ onClose, hostId, propertyId }: MessagesProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      sender: "John",
-      text: "Hello!",
-      unread: true,
-      timestamp: "2024-02-24T10:00:00Z",
-    },
-    {
-      id: 2,
-      sender: "Jane",
-      text: "How are you?",
-      unread: false,
-      timestamp: "2024-02-24T10:01:00Z",
-      readAt: "2024-02-24T10:02:00Z",
-    },
-  ]);
-
+const Messages = () => {
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [selectedConversationId, setSelectedConversationId] = useState<
+    string | null
+  >(null);
+  const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [open, setOpen] = React.useState(false);
+  const [selectedUser, setSelectedUser] = useState("");
+  const [initialMessage, setInitialMessage] = useState("");
+  const { session } = useAuth();
+  const { toast } = useToast();
 
-  const markAsRead = (id: number) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((message) =>
-        message.id === id
-          ? { ...message, unread: false, readAt: new Date().toISOString() }
-          : message
-      )
-    );
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      if (session?.user?.id) {
+        try {
+          await fetchConversations(session.user.id);
+          const usersData = await fetchUsers();
+          setUsers(usersData?.users || []);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+    fetchData();
+  }, [session]);
 
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
+  const fetchUsersData = async () => {
+    try {
+      const data = await fetchUsers();
+      setUsers(data.users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
     }
   };
 
-  const handleSendMessage = () => {
-    if (newMessage.trim() || selectedImage) {
-      const newMsg: Message = {
-        id: messages.length + 1,
-        sender: "You",
-        text: newMessage,
-        unread: true,
-        timestamp: new Date().toISOString(),
-      };
+  const fetchConversations = async (userId: string) => {
+    try {
+      const data = await getConversations(userId);
+      setConversations(data.conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+    }
+  };
 
-      if (selectedImage) {
-        newMsg.image = URL.createObjectURL(selectedImage);
+  const fetchMessages = async (conversationId: string) => {
+    try {
+      const data = await getMessages(conversationId);
+      setMessages(data.messages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (newMessage && selectedConversationId) {
+      try {
+        await sendMessage(
+          selectedConversationId,
+          session?.user?.id,
+          newMessage
+        );
+        setNewMessage("");
+        // Fetch messages again to update the UI
+        fetchMessages(selectedConversationId);
+      } catch (error) {
+        console.error("Error sending message:", error);
       }
-
-      setMessages([...messages, newMsg]);
-      setNewMessage("");
-      setSelectedImage(null);
     }
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">
-          {propertyId ? "Property Inquiry" : "Messages"}
-          {hostId && !propertyId && ` with ${hostId}`}
-        </h2>
-        {onClose && (
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-      <div className="flex-1 overflow-y-auto">
-        <ul className="space-y-4">
-          {messages.map((message) => (
-            <li
-              key={message.id}
-              className="py-2 px-3 rounded-lg bg-gray-50 last:border-none"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <p className="font-semibold">{message.sender}</p>
-                  <p className="text-gray-600">{message.text}</p>
-                  {message.image && (
-                    <img
-                      src={message.image}
-                      alt="Message attachment"
-                      className="mt-2 max-w-[200px] rounded-lg"
-                    />
-                  )}
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-gray-400">
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </span>
-                    {message.readAt ? (
-                      <CheckCheck className="h-4 w-4 text-blue-500" />
-                    ) : (
-                      <Check className="h-4 w-4 text-gray-400" />
-                    )}
-                  </div>
-                </div>
-                {message.unread && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => markAsRead(message.id)}
-                  >
-                    Mark as Read
-                  </Button>
-                )}
+    <div className="flex h-screen">
+      <div className="w-1/4 border-r p-4">
+        <h2 className="text-lg font-semibold mb-4">Conversations</h2>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>Start New Conversation</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>New Conversation</DialogTitle>
+              <DialogDescription>
+                Select a user to start a conversation with.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Recipient
+                </Label>
+                <Select
+                  onValueChange={setSelectedUser}
+                  defaultValue={users[0]?.id}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select a recipient" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {users.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </li>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="message" className="text-right">
+                  Message
+                </Label>
+                <Textarea
+                  id="message"
+                  className="col-span-3"
+                  value={initialMessage}
+                  onChange={(e) => setInitialMessage(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Start Conversation</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <div className="space-y-2">
+          {conversations.map((conversation) => (
+            <Button
+              key={conversation.id}
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                setSelectedConversationId(conversation.id);
+                fetchMessages(conversation.id);
+              }}
+            >
+              Conversation {conversation.id}
+            </Button>
           ))}
-        </ul>
-      </div>
-      <div className="mt-4 space-y-2">
-        <Input
-          type="text"
-          placeholder="Type a message..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === "Enter") {
-              handleSendMessage();
-            }
-          }}
-        />
-        <div className="flex items-center gap-2">
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={handleImageSelect}
-            className="hidden"
-            id="image-upload"
-          />
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => document.getElementById("image-upload")?.click()}
-          >
-            <ImagePlus className="h-4 w-4" />
-          </Button>
-          <Button
-            className="flex-1"
-            onClick={handleSendMessage}
-            disabled={!newMessage.trim() && !selectedImage}
-          >
-            Send
-          </Button>
         </div>
+      </div>
+      <div className="flex-1 flex flex-col">
+        {selectedConversationId ? (
+          <>
+            <Card className="flex-1 overflow-hidden">
+              <CardHeader>
+                <h3 className="text-lg font-semibold">Chat</h3>
+              </CardHeader>
+              <CardContent className="p-4">
+                <ScrollArea className="h-[calc(100vh-200px)]">
+                  <div className="space-y-2">
+                    {messages.map((message) => (
+                      <div key={message.id}>{message.content}</div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+            <div className="p-4">
+              <Input
+                type="text"
+                placeholder="Type your message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="mr-2"
+              />
+              <Button onClick={handleSendMessage}>Send</Button>
+            </div>
+          </>
+        ) : (
+          <div className="p-4">Select a conversation to start chatting</div>
+        )}
       </div>
     </div>
   );
 };
+
+export default Messages;

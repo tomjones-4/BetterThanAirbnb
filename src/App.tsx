@@ -10,6 +10,7 @@ import Search from "./pages/Search";
 import ListingPage from "./pages/listings/[listingId]";
 import ChangelogPage from "./pages/Changelog";
 import ProfilePage from "./pages/Profile";
+import Messages from "./components/Messages";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/search" element={<Search />} />
           <Route path="/listings/:id" element={<ListingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/messages" element={<Messages />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
