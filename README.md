@@ -1,5 +1,9 @@
 # Welcome to Better than Airbnb
 
+## TODOs
+
+* Let users confirm or suggest new dates from the conversation UI
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/f8181d33-01c8-48ec-bfed-5bd9f5b723c3
