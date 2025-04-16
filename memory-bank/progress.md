@@ -22,6 +22,7 @@ _This file tracks what works, what's left to build, the current status, and know
 - Improved styling and scrollability of the Add Listing form.
 - Improved the listing details page by adjusting spacing, conditionally rendering details, adding a placeholder image, and using the same amenity icons as the Add Listing form.
 - Implemented the changes to the listing details page.
+- Fixed the `fetchUsers` function to use the correct Supabase URL.
 
 ## What's Left to Build
 

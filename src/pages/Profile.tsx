@@ -25,7 +25,7 @@ import {
   Trash2,
   AlertCircle,
 } from "lucide-react";
-import { Messages } from "@/components/Messages";
+import Messages from "@/components/Messages";
 import { useToast } from "@/hooks/use-toast";
 import { useUserListings } from "@/hooks/useUserListings";
 import EditListingDialog from "@/components/EditListingDialog";

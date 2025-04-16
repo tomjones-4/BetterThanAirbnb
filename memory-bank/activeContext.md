@@ -14,7 +14,7 @@ Completing the refactoring of Index page listing fetching into a custom hook bas
 
 ## Next Steps
 
-- Update `memory-bank/progress.md` to reflect the refactoring and creation of the `useListings` hook.
+- Update `memory-bank/progress.md` to reflect the fix to the `fetchUsers` function.
 - Attempt completion of the task.
 
 ## Active Decisions & Considerations

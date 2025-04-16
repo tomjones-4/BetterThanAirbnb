@@ -1,15 +1,9 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  "http://127.0.0.1:54323/project/default";
-const supabaseKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "your-anon-key";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-const supabase = createClientComponentClient({
-  supabaseUrl: supabaseUrl,
-  supabaseKey: supabaseKey,
-});
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function getConversations(userId: string) {
   try {
@@ -17,7 +11,10 @@ export async function getConversations(userId: string) {
       `${supabaseUrl}/functions/v1/get-conversations`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
         body: JSON.stringify({ userId }),
       }
     );
@@ -45,7 +42,7 @@ export async function createConversation(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer \${supabase.auth.session()?.access_token}`,
+          Authorization: `Bearer ${getAccessToken()}`,
         },
         body: JSON.stringify({ recipientId, initialMessage }),
       }
@@ -67,7 +64,10 @@ export async function fetchUsers() {
   try {
     const response = await fetch(`${supabaseUrl}/functions/v1/fetch-users`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
     });
 
     if (!response.ok) {
@@ -90,7 +90,10 @@ export async function sendMessage(
   try {
     const response = await fetch(`${supabaseUrl}/functions/v1/send-message`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
       body: JSON.stringify({ conversationId, senderId, content }),
     });
 
@@ -110,7 +113,10 @@ export async function getMessages(conversationId: string) {
   try {
     const response = await fetch(`${supabaseUrl}/functions/v1/get-messages`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
       body: JSON.stringify({ conversationId }),
     });
 
@@ -124,4 +130,16 @@ export async function getMessages(conversationId: string) {
     console.error("Error fetching messages:", error);
     throw error;
   }
+}
+
+async function getSession() {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session;
+}
+
+async function getAccessToken() {
+  const session = await getSession();
+  return session?.access_token || null;
 }

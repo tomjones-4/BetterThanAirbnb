@@ -130,3 +130,10 @@
 - Moved the handleSignOut function to the useAuth hook.
 - Implemented code splitting for the SignOut component.
 - Affected files: `src/components/Navigation.tsx`, `src/components/auth/SignOut.tsx`, `src/hooks/useAuth.tsx`, `src/components/auth/SignOutButton.tsx`
+
+## 2025-04-14 - Fix fetchUsers Function
+
+- Updated the `fetchUsers` function in `src/lib/messages.ts` to use `VITE_SUPABASE_URL` instead of `NEXT_PUBLIC_SUPABASE_URL`.
+- Verified that the `SUPABASE_URL` environment variable in the Supabase project settings is set to the same value as `VITE_SUPABASE_URL` in the `.env` file.
+- This change ensures that the `fetchUsers` function correctly retrieves user data from the Supabase database.
+- Affected files: `src/lib/messages.ts`
