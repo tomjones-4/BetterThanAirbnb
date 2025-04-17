@@ -117,8 +117,9 @@ const ProfilePage = () => {
     }
   };
 
+  // TODO - remove these after testing
   // Mock conversations for demo purposes
-  const conversations = [
+  const fakeConversations = [
     {
       id: 1,
       name: "Mark Wilson",
@@ -452,7 +453,7 @@ const ProfilePage = () => {
                   </CardHeader>
                   <CardContent className="p-0">
                     <ul className="divide-y">
-                      {conversations.map((convo) => (
+                      {fakeConversations.map((convo) => (
                         <li
                           key={convo.id}
                           className={`p-4 cursor-pointer hover:bg-gray-50 ${
@@ -490,7 +491,7 @@ const ProfilePage = () => {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-xl">
                     {
-                      conversations.find((c) => c.id === activeConversation)
+                      fakeConversations.find((c) => c.id === activeConversation)
                         ?.name
                     }
                   </CardTitle>

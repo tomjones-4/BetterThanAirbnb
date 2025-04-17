@@ -145,6 +145,5 @@ async function getSession() {
 
 async function getAccessToken() {
   const session = await getSession();
-  console.log("access token", session?.access_token);
   return session?.access_token || null;
 }
