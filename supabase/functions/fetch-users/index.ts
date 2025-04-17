@@ -15,22 +15,37 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_ANON_KEY;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const authHeader = req.headers.get("Authorization") ?? "";
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error("Missing Supabase credentials");
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey, {
-      auth: {
-        persistSession: false,
+      global: {
+        headers: {
+          Authorization: authHeader,
+        },
       },
+      auth: { persistSession: false },
     });
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const { data: users, error } = await supabase
       .from("users")
-      .select("id, name, email");
+      .select("id, full_name");
 
     if (error) {
       console.error(error);
@@ -44,7 +59,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Function error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

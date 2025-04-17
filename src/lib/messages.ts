@@ -7,13 +7,14 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function getConversations(userId: string) {
   try {
+    const token = await getAccessToken();
     const response = await fetch(
       `${supabaseUrl}/functions/v1/get-conversations`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${getAccessToken()}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ userId }),
       }
@@ -36,13 +37,14 @@ export async function createConversation(
   initialMessage: string
 ) {
   try {
+    const token = await getAccessToken();
     const response = await fetch(
       `${supabaseUrl}/functions/v1/create-conversation`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${getAccessToken()}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ recipientId, initialMessage }),
       }
@@ -62,11 +64,12 @@ export async function createConversation(
 
 export async function fetchUsers() {
   try {
+    const token = await getAccessToken();
     const response = await fetch(`${supabaseUrl}/functions/v1/fetch-users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${getAccessToken()}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -88,11 +91,12 @@ export async function sendMessage(
   content: string
 ) {
   try {
+    const token = await getAccessToken();
     const response = await fetch(`${supabaseUrl}/functions/v1/send-message`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${getAccessToken()}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ conversationId, senderId, content }),
     });
@@ -111,11 +115,12 @@ export async function sendMessage(
 
 export async function getMessages(conversationId: string) {
   try {
+    const token = await getAccessToken();
     const response = await fetch(`${supabaseUrl}/functions/v1/get-messages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${getAccessToken()}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ conversationId }),
     });
@@ -133,13 +138,15 @@ export async function getMessages(conversationId: string) {
 }
 
 async function getSession() {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  return session;
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw error;
+  return data.session;
 }
 
 async function getAccessToken() {
   const session = await getSession();
+  // todo - remove after testing
+  console.log("access token", session?.access_token);
+  // end todo
   return session?.access_token || null;
 }

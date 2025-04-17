@@ -21,30 +21,32 @@ serve(async (req) => {
       throw new Error("Missing parameters");
     }
 
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_ANON_KEY;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const authHeader = req.headers.get("Authorization") ?? "";
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error("Missing Supabase credentials");
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey, {
-      auth: {
-        persistSession: false,
+      global: {
+        headers: {
+          Authorization: authHeader,
+        },
       },
+      auth: { persistSession: false },
     });
 
-    const authHeader = req.headers.get("Authorization");
-    const userId = authHeader?.split(" ")[1]; // Assuming Bearer token
-
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ error: "Missing user ID or invalid token" }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const { data: conversation, error: conversationError } = await supabase
@@ -84,13 +86,13 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ conversation, message }), {
+    return new Response(JSON.stringify({ conversations }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Function error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
-      status: 400,
+      status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
