@@ -145,8 +145,6 @@ async function getSession() {
 
 async function getAccessToken() {
   const session = await getSession();
-  // todo - remove after testing
   console.log("access token", session?.access_token);
-  // end todo
   return session?.access_token || null;
 }
