@@ -110,8 +110,8 @@ const EditListingDialog: React.FC<EditListingDialogProps> = ({
   );
 
   // Extract start and end dates from listing availability
-  const startDate = new Date(listing.startDate);
-  const endDate = new Date(listing.endDate);
+  const startDate = listing.start_date ? new Date(listing.start_date) : null;
+  const endDate = listing.end_date ? new Date(listing.end_date) : null;
 
   const {
     register,
